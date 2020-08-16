@@ -1,6 +1,6 @@
 import numpy as np
 import time
-#import dill as pickle
+import pickle as pickle
 
 """ 
 Functions in this file:
@@ -23,34 +23,58 @@ def iterate(obj):
             pairs.append((idx,key))
     return pairs
 
-def run_episode(env, agents, action_sets, max_episode_len, method, display):
-    """ Runs an episode of the given environments """ 
-    obs = env.reset() 
-    n = len(agents) 
+def run_episode_single_agent(env, agent, max_episode_len, method, display):
+    """ Runs an episode of a single_agent environment """
+    obs = env.reset()
+    total_rewards = 0.0 # total rewards is agent rewards 
+    done = False
+    train_steps = 0 
+
+    for _ in range(max_episode_len):
+        if display:
+            env.render() 
+            time.sleep(0.15)
+
+        action = agent.action_callback(obs)  
+        new_obs, reward, done, info = env.step(action) 
+
+        if method == 'train':
+            agent.experience_callback(obs, action, new_obs, reward, done)
+
+        total_rewards += reward 
+
+        obs = new_obs 
+        train_steps += 1
+    
+        if done:
+            break 
+
+    return total_rewards, [total_rewards], train_steps 
+
+def run_episode_multi_agent(env, agents, max_episode_len, method, display):
+    """ Runs an enpisode of a multi agent environment """ 
+    # TODO: probably will not work on multiagent environment right now
+    obs = env.reset()
     total_rewards = 0.0 
     agent_rewards = [0.0 for _ in range(len(agents))] 
 
-    done = False 
-    train_steps = 0    
-
-    for _ in range(max_episode_len):
+    for _ in range(max_episode_len): 
         if display:
             env.render()
             time.sleep(0.15)
         
-        (actions_e, actions_a) = action_sets
-        # TODO SARAH: what is going on here ?
-        new_obs, rewards, done, info = env.step(actions_e)
-
+        actions = [agents[idx].action_callback(obs_i) for (idx, obs_i) in enumerate(obs)]
+        # usually will need to do some transformations here. For now assume that environment just takes integers and uses lists.
+        new_obs, rewards, done, info = env.step(actions) 
 
         if method == 'train':
-            for idx, key in iterate(actions_e):
-                agents[idx].experience_callback(obs[key], actions_a[idx], new_obs[key], rewards[key], done[key])
-    
-        for idx, key in iterate(actions_e):
-            agent_rewards[idx] += rewards[key] 
-            total_rewards += rewards[key] 
-
+            for idx, obs_i in enumerate(obs):
+                agents[idx].experience_callback(obs[idx], actions[idx], new_obs[idx], rewards[idx], done[idx])
+        
+        for idx, _ in enumerate(obs):
+            agent_rewards[idx] += rewards[idx]
+            total_rewards += rewards[idx]
+        
         obs = new_obs 
         train_steps += 1
 
@@ -66,9 +90,10 @@ def run_episode(env, agents, action_sets, max_episode_len, method, display):
     return total_rewards, agent_rewards, train_steps
 
 
-def train(env, agents, action_sets, max_episode_len, num_episodes, method, display, save_rate, save_path, train_result_path):
+def train(env, is_env_multiagent, agents, max_episode_len, num_episodes, method, display, save_rate, agents_save_path, train_result_path):
+    if agents_save_path: import dill # used to save the agents themselves, pickle bad at serializing objecst 
+    if train_result_path: import pickle 
 
-    """ TODO: what information do we want from training?"""
     episode_rewards = [0.0]
     agent_rewards = [[0.0] for _ in range(len(agents))]
     final_ep_rewards = []
@@ -80,9 +105,11 @@ def train(env, agents, action_sets, max_episode_len, num_episodes, method, displ
     print("Starting iterations...")
     t_time = time.time()
     for i in range(num_episodes):
+        if is_env_multiagent:
+            ep_results = run_episode_multi_agent(env, agents, max_episode_len, method, display) 
+        else:
+            ep_results = run_episode_single_agent(env, agents[0], max_episode_len, method, display) 
 
-        ep_results = run_episode(env, agents, action_sets, max_episode_len, method, display)
-        
         t_reward, a_rewards, t_steps = ep_results
         train_steps += t_steps
 
@@ -94,7 +121,6 @@ def train(env, agents, action_sets, max_episode_len, num_episodes, method, displ
             agent.episode_callback()
 
         if len(episode_rewards) % save_rate == 0:
-
             final_ep_rewards.append(np.mean(episode_rewards[-save_rate:]))
             for i, rew in enumerate(agent_rewards):
                 final_ag_ep_rewards[i].append(np.mean(rew[-save_rate:]))
@@ -103,11 +129,11 @@ def train(env, agents, action_sets, max_episode_len, num_episodes, method, displ
                 train_steps, len(episode_rewards), final_ep_rewards[-1], time.time() - t_time
             ))
 
-            if save_path:
-                with open(save_path, "wb") as fp:
+            if agents_save_path: # if save path provided, save agents to agents_save_path
+                with open(agents_save_path, "wb") as fp:
                     pickle.dump(agents, fp)
             
-            if train_result_path:
+            if train_result_path: # if train_result_path provided, save results to train_result_path
                 save_obj = dict()
                 
                 save_obj["final_ep_rewards"] = final_ep_rewards 
@@ -119,6 +145,7 @@ def train(env, agents, action_sets, max_episode_len, num_episodes, method, displ
                     pickle.dump(save_obj, fp)
 
             t_time = time.time()
+
         episode_rewards.append(0)
         for (idx, a_reward) in enumerate(a_rewards):
             agent_rewards[idx].append(0)
@@ -127,8 +154,8 @@ def train(env, agents, action_sets, max_episode_len, num_episodes, method, displ
     
     print("Finished a total of {} episodes.".format(len(episode_rewards)))
     
-    if save_path:
-        print("Agent saved to {}.".format(save_path))
+    if agents_save_path:
+        print("Agent saved to {}.".format(agents_save_path))
 
     if train_result_path:
         # final_ep_rewards, final_ag_rewards, episode_rewards, agent_rewards 

@@ -47,7 +47,7 @@ class PolicyGradientAgent(object):
     def softmax(self, state):
         """ softmax(state * weights) """
         z = state.dot(self.theta)
-        exp = np.exp(z)
+        exp = np.exp(z - np.max(z))
         return exp/np.sum(exp)
 
     def policy(self, state):
@@ -124,15 +124,18 @@ class PolicyGradientAgent(object):
 def test_discrete():
 
     import gym
-    env = gym.make("Taxi-v3").env
+    env = gym.make("Taxi-v3").env # policy gradient not well suited to taxi env. should work but may take long time
     env.reset()
     env.render()
 
     num_actions = env.action_space.n
     num_states = env.observation_space.n
-    np.zeros([env.observation_space.n, env.action_space.n])
-    theta = np.random.rand(num_actions, num_states)
-    pg_agent = PolicyGradientAgent(num_actions, theta, alpha=0.00025, gamma=0.9, mapping_fn=None)
+    theta = np.random.rand(num_states, num_actions)
+    
+    pg_agent = PolicyGradientAgent(num_actions, theta, alpha=0.025, gamma=0.9, mapping_fn=lambda x:np.squeeze(np.eye(500)[np.array(x).reshape(-1)])/500)
+
+    import train
+    train.train(env=env, is_env_multiagent=False, agents=[pg_agent], max_episode_len=10000, num_episodes=1000, method='train', display=False, save_rate=1, agents_save_path="", train_result_path="")
 
 
 def test_continuous():
@@ -140,14 +143,13 @@ def test_continuous():
     env = gym.make('CartPole-v0')
     num_actions = env.action_space.n
     num_states = env.observation_space.shape[0]
-    theta = np.random.rand(num_actions, num_states)
+    theta = np.random.rand(num_states, num_actions)
 
     pg_agent = PolicyGradientAgent(num_actions, theta, alpha=0.00025, gamma=0.9, mapping_fn=None)
-    #action_sets = [env.get_action_set(agents, obs, method)]
 
     import train
-    train.train(env=env, agents=[pg_agent], max_episode_len=10000, num_episodes=10000, method='train', display=False, save_rate=10, save_path="", train_result_path="")
+    train.train(env=env, is_env_multiagent=False, agents=[pg_agent], max_episode_len=10000, num_episodes=10000, method='train', display=False, save_rate=10, agents_save_path="", train_result_path="")
 
 if __name__ == "__main__":
-    #test_discrete()
+    # test_discrete()
     test_continuous()
