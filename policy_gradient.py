@@ -124,7 +124,7 @@ class PolicyGradientAgent(object):
 def test_discrete():
 
     import gym
-    env = gym.make("Taxi-v3").env
+    env = gym.make("Taxi-v2").env
     env.reset()
     env.render()
 
@@ -149,5 +149,5 @@ def test_continuous():
     train.train(env=env, agents=[pg_agent], max_episode_len=10000, num_episodes=10000, method='train', display=False, save_rate=10, save_path="", train_result_path="")
 
 if __name__ == "__main__":
-    #test_discrete()
-    test_continuous()
+    test_discrete()
+    #test_continuous()
