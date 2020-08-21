@@ -57,7 +57,8 @@ def run_episode_multi_agent(env, agents, max_episode_len, method, display):
     obs = env.reset()
     total_rewards = 0.0 
     agent_rewards = [0.0 for _ in range(len(agents))] 
-
+    train_steps = 0
+    
     for _ in range(max_episode_len): 
         if display:
             env.render()
