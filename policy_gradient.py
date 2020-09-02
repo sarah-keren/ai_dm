@@ -169,7 +169,9 @@ def test_continuous_single_agent():
 
 def test_continuous_multi_agent():
     import train
-
+    #A simple multi-agent particle world with a continuous observation and discrete action space, along with some basic simulated physics.
+    # Used in the paper [Multi-Agent Actor-Critic for Mixed Cooperative-Competitive Environments](https://arxiv.org/pdf/1706.02275.pdf)
+    # the code for the environment can be found in https://github.com/openai/multiagent-particle-envs
     sys.path.append("../particle_env")
     #import particle_env
     from make_env import make_env
