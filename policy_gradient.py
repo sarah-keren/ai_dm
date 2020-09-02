@@ -94,7 +94,11 @@ class PolicyGradientAgent(object):
 
         action = np.random.choice(self.num_actions, p=probs[0])
         
+<<<<<<< HEAD
         self.compute_gradient(probs, state, action)
+=======
+            self.compute_gradient(probs, state, action)
+>>>>>>> master
         if self.action_return_format == 'vector':
             return self.int_to_vector(action)
 
@@ -144,11 +148,20 @@ def test_discrete():
     theta = np.random.rand(num_states, num_actions)
     
     pg_agent = PolicyGradientAgent(num_actions, theta, alpha=0.025, gamma=0.9, mapping_fn=lambda x:np.squeeze(np.eye(500)[np.array(x).reshape(-1)])/500)
+<<<<<<< HEAD
+
+    import train
+    train.train(env=env, is_env_multiagent=False, agents=[pg_agent], max_episode_len=10000, num_episodes=1000, method='train', display=False, save_rate=1, agents_save_path="", train_result_path="")
+=======
+>>>>>>> master
 
     import train
     train.train(env=env, is_env_multiagent=False, agents=[pg_agent], max_episode_len=10000, num_episodes=1000, method='train', display=False, save_rate=1, agents_save_path="", train_result_path="")
 
+<<<<<<< HEAD
+=======
 
+>>>>>>> master
 def test_continuous_single_agent():
     import gym
     env = gym.make('CartPole-v0')
@@ -164,9 +177,15 @@ def test_continuous_single_agent():
 def test_continuous_multi_agent():
     import train 
 
+<<<<<<< HEAD
     sys.path.append("./particle_env")
     import particle_env
     from make_env import make_env 
+=======
+    sys.path.append('../../environments/particle_env')
+
+    from make_env import make_env
+>>>>>>> master
     env = make_env('simple_speaker_listener')
     # init agents
     agent1 = PolicyGradientAgent(num_actions=3, theta=np.random.rand(3,3), action_return_format="vector") # speaker
@@ -176,5 +195,10 @@ def test_continuous_multi_agent():
     train.train(env=env, is_env_multiagent=True, agents=[agent1, agent2], max_episode_len=25, num_episodes=10000, method='train', display=False, save_rate=10, agents_save_path="", train_result_path="")
 
 if __name__ == "__main__":
+<<<<<<< HEAD
     test_continuous_single_agent()
     # test_continuous_multi_agent()
+=======
+    #test_continuous_single_agent()
+    test_continuous_multi_agent()
+>>>>>>> master
