@@ -170,8 +170,8 @@ def test_continuous_single_agent():
 def test_continuous_multi_agent():
     import train
 
-    sys.path.append("./particle_env")
-    import particle_env
+    sys.path.append("../particle_env")
+    #import particle_env
     from make_env import make_env
     env = make_env('simple_speaker_listener')
     # init agents
