@@ -1,4 +1,4 @@
-import numpy as np 
+import numpy as np
 import sys
 
 """ 
@@ -25,12 +25,14 @@ Preferences are linear in features (13.3)
 Actions and gradients derived according to softmax distribution (13.2)
 """
 
+
 class PolicyGradientAgent(object):
     """ Generic Policy Gradient Implementation """
+
     def __init__(self, num_actions, theta, alpha=0.00025, gamma=0.9, mapping_fn=None, action_return_format=None):
         """ Parameters """
         self.theta = theta
-        self.alpha = alpha 
+        self.alpha = alpha
         self.gamma = gamma
 
         """ Record keeping / episode """
@@ -47,58 +49,55 @@ class PolicyGradientAgent(object):
     def int_to_vector(self, action):
         """ Turns integer action into one hot vector """
         vec = np.zeros(self.num_actions)
-        vec[action] = 1 
-        return vec 
-    
+        vec[action] = 1
+        return vec
+
     def softmax(self, state):
         """ softmax(state * weights) """
         z = state.dot(self.theta)
         exp = np.exp(z - np.max(z))
-        return exp/np.sum(exp)
+        return exp / np.sum(exp)
 
     def policy(self, state):
         """ Returns agent policy given state """
         probs = self.softmax(state)
         return probs
-    
+
     def softmax_gradient(self, softmax):
         """ Derivative of the softmax w.r.t. theta """
         s = softmax.reshape(-1, 1)
         return np.diagflat(s) - np.dot(s, s.T)
-    
+
     def compute_gradient(self, probs, state, action):
         """ Computes the gradient of log(softmax) for a state and action """
         dsoftmax = self.softmax_gradient(probs)[action, :]
         dlog = dsoftmax / probs[0, action]
-        grad = state.T.dot(dlog[None,:])
-        
+        grad = state.T.dot(dlog[None, :])
+
         self.grads.append(grad)
-        return 
+        return
 
     def update_weights(self):
         """ Update weights """
         for i in range(len(self.grads)):
             present_val_of_rewards = sum([r * (self.gamma ** r) \
-                        for t, r in enumerate(self.rewards[i:])])
-            self.theta += self.alpha * self.grads[i] * present_val_of_rewards 
-        return 
+                                          for t, r in enumerate(self.rewards[i:])])
+            self.theta += self.alpha * self.grads[i] * present_val_of_rewards
+        return
 
     """ Training Callbacks """
+
     def action_callback(self, state):
         """ Take an action according to policy. Save gradient."""
         if self.mapping_fn:
             state = self.mapping_fn(state)
 
-        state = state[None,:]
+        state = state[None, :]
         probs = self.policy(state)
 
         action = np.random.choice(self.num_actions, p=probs[0])
-        
-<<<<<<< HEAD
+
         self.compute_gradient(probs, state, action)
-=======
-            self.compute_gradient(probs, state, action)
->>>>>>> master
         if self.action_return_format == 'vector':
             return self.int_to_vector(action)
 
@@ -107,7 +106,7 @@ class PolicyGradientAgent(object):
     def experience_callback(self, obs, action, new_obs, reward, done):
         """ Receive rewards """
         self.rewards.append(reward)
-    
+
     def episode_callback(self):
         """ Update weights, reset records for new episodes"""
         self.update_weights()
@@ -116,52 +115,44 @@ class PolicyGradientAgent(object):
         self.rewards = []
 
     """ Evaluation callbacks """
+
     def policy_callback(self, state):
         """ Take an action according to policy."""
         if self.mapping_fn:
             state = state.mapping_fn(state)
-        
-        state = state[None,:]
-        probs = self.policy(state) 
+
+        state = state[None, :]
+        probs = self.policy(state)
         action = np.random.choice(self.num_actions, p=probs[0])
 
         if self.action_return_format == 'vector':
             return self.int_to_vector(action)
-            
-        return action 
-    
+
+        return action
+
     def reset(self):
         """ Reset records for new episodes """
-        return 
-
+        return
 
 
 def test_discrete():
-
     import gym
-    env = gym.make("Taxi-v2").env # policy gradient not well suited to taxi env. should work but may take long time
+    env = gym.make("Taxi-v2").env  # policy gradient not well suited to taxi env. should work but may take long time
     env.reset()
     env.render()
 
     num_actions = env.action_space.n
     num_states = env.observation_space.n
     theta = np.random.rand(num_states, num_actions)
-    
-    pg_agent = PolicyGradientAgent(num_actions, theta, alpha=0.025, gamma=0.9, mapping_fn=lambda x:np.squeeze(np.eye(500)[np.array(x).reshape(-1)])/500)
-<<<<<<< HEAD
+
+    pg_agent = PolicyGradientAgent(num_actions, theta, alpha=0.025, gamma=0.9,
+                                   mapping_fn=lambda x: np.squeeze(np.eye(500)[np.array(x).reshape(-1)]) / 500)
 
     import train
-    train.train(env=env, is_env_multiagent=False, agents=[pg_agent], max_episode_len=10000, num_episodes=1000, method='train', display=False, save_rate=1, agents_save_path="", train_result_path="")
-=======
->>>>>>> master
+    train.train(env=env, is_env_multiagent=False, agents=[pg_agent], max_episode_len=10000, num_episodes=1000,
+                method='train', display=False, save_rate=1, agents_save_path="", train_result_path="")
 
-    import train
-    train.train(env=env, is_env_multiagent=False, agents=[pg_agent], max_episode_len=10000, num_episodes=1000, method='train', display=False, save_rate=1, agents_save_path="", train_result_path="")
 
-<<<<<<< HEAD
-=======
-
->>>>>>> master
 def test_continuous_single_agent():
     import gym
     env = gym.make('CartPole-v0')
@@ -172,33 +163,26 @@ def test_continuous_single_agent():
     pg_agent = PolicyGradientAgent(num_actions, theta, alpha=0.00025, gamma=0.9, mapping_fn=None)
 
     import train
-    train.train(env=env, is_env_multiagent=False, agents=[pg_agent], max_episode_len=10000, num_episodes=10000, method='train', display=False, save_rate=10, agents_save_path="", train_result_path="")
+    train.train(env=env, is_env_multiagent=False, agents=[pg_agent], max_episode_len=10000, num_episodes=10000,
+                method='train', display=False, save_rate=10, agents_save_path="", train_result_path="")
+
 
 def test_continuous_multi_agent():
-    import train 
+    import train
 
-<<<<<<< HEAD
     sys.path.append("./particle_env")
     import particle_env
-    from make_env import make_env 
-=======
-    sys.path.append('../../environments/particle_env')
-
     from make_env import make_env
->>>>>>> master
     env = make_env('simple_speaker_listener')
     # init agents
-    agent1 = PolicyGradientAgent(num_actions=3, theta=np.random.rand(3,3), action_return_format="vector") # speaker
-    agent2 = PolicyGradientAgent(num_actions=5, theta=np.random.rand(11,5), action_return_format="vector") # listener
+    agent1 = PolicyGradientAgent(num_actions=3, theta=np.random.rand(3, 3), action_return_format="vector")  # speaker
+    agent2 = PolicyGradientAgent(num_actions=5, theta=np.random.rand(11, 5), action_return_format="vector")  # listener
 
     # run train
-    train.train(env=env, is_env_multiagent=True, agents=[agent1, agent2], max_episode_len=25, num_episodes=10000, method='train', display=False, save_rate=10, agents_save_path="", train_result_path="")
+    train.train(env=env, is_env_multiagent=True, agents=[agent1, agent2], max_episode_len=25, num_episodes=10000,
+                method='train', display=False, save_rate=10, agents_save_path="", train_result_path="")
+
 
 if __name__ == "__main__":
-<<<<<<< HEAD
-    test_continuous_single_agent()
-    # test_continuous_multi_agent()
-=======
     #test_continuous_single_agent()
     test_continuous_multi_agent()
->>>>>>> master
