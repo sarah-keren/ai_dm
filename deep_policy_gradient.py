@@ -51,13 +51,15 @@ class PolicyNetwork(nn.Module): # The network itself is separate from the agent
         return x
     
 class DPGAgent(object):
-    def __init__(self, learning_rate, input_dims, num_actions, gamma=0.99, l1_size=256, l2_size=256, mapping_fn=None):
+    def __init__(self, learning_rate, input_dims, num_actions, gamma=0.99, l1_size=256, l2_size=256, mapping_fn=None, action_return_format=None):
         self.gamma = gamma 
         self.reward_mem = [] 
         self.action_mem = [] 
         self.num_actions = num_actions
         self.gamma = gamma
         self.policy = PolicyNetwork(learning_rate, input_dims, l1_size, l2_size, num_actions, mapping_fn)
+        self.action_return_format = action_return_format
+
 
     def int_to_vector(self, action):
         """ Turns integer action into one hot vector """
@@ -103,7 +105,12 @@ class DPGAgent(object):
         log_probs = action_probs.log_prob(action)
         self.action_mem.append(log_probs)
 
-        return action.item()
+        returned_action = action.item()
+        if self.action_return_format == 'vector':
+            returned_action = self.int_to_vector(returned_action)
+
+        #return action.item()
+        return returned_action
 
     def experience_callback(self, obs, action, new_obs, reward, done):
         self.reward_mem.append(reward)
@@ -157,8 +164,8 @@ def test_continuous_multi_agent():
     # init agents
     learning_rate = 0.01
 
-    dpg_agent_speaker = DPGAgent(learning_rate, input_dims=3, num_actions=3, gamma=0.99, l1_size=256, l2_size=256, mapping_fn=None)
-    dpg_agent_listener = DPGAgent(learning_rate, input_dims=11, num_actions=5, gamma=0.99, l1_size=256, l2_size=256,mapping_fn=None)
+    dpg_agent_speaker = DPGAgent(learning_rate, input_dims=3, num_actions=3, gamma=0.99, l1_size=256, l2_size=256, mapping_fn=None, action_return_format="vector")
+    dpg_agent_listener = DPGAgent(learning_rate, input_dims=11, num_actions=5, gamma=0.99, l1_size=256, l2_size=256,mapping_fn=None, action_return_format="vector")
 
     # run train
     train.train(env=env, is_env_multiagent=True, agents=[dpg_agent_speaker, dpg_agent_listener], max_episode_len=25, num_episodes=10000,
