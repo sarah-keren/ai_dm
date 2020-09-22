@@ -116,8 +116,8 @@ class BehavioralCloningAgent(object):
 def test_taxi():
 
     import gym
-    from taxi_utils import Taxi_Expert
-    from taxi_utils import Taxi_Processor
+    from test_utils import Taxi_Expert
+    from test_utils import Taxi_Processor
 
     env = gym.make("Taxi-v2").env
     env.reset()
