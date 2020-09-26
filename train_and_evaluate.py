@@ -5,7 +5,7 @@ import pickle as pickle
 """ 
 Functions in this file:
 
-train(env, agents, arglist): Training function for reinforcement learning agents. 
+run(env, agents, arglist): Training and evaluation function for reinforcement learning agents. 
 run_episode(agents, env, arglist): Runs an episode of the environment. Used in train.
 iterate(obj): returns an iterable over an object that may be a list or a dictionary
 
@@ -27,8 +27,7 @@ def run_episode_single_agent(env, agent, max_episode_len, method, display):
     """ Runs an episode of a single_agent environment """
     obs = env.reset()
     total_rewards = 0.0 # total rewards is agent rewards 
-    done = False
-    train_steps = 0 
+    train_steps = 0
 
     for _ in range(max_episode_len):
         if display:
@@ -91,8 +90,19 @@ def run_episode_multi_agent(env, agents, max_episode_len, method, display):
     return total_rewards, agent_rewards, train_steps
 
 
-def train(env, is_env_multiagent, agents, max_episode_len, num_episodes, method, display, save_rate, agents_save_path, train_result_path):
-    if agents_save_path: import dill # used to save the agents themselves, pickle bad at serializing objecst 
+def train(env, is_env_multiagent, agents, max_episode_len, num_episodes, display, save_rate, agents_save_path, train_result_path):
+    method = 'train'
+    run(env, is_env_multiagent, agents, max_episode_len, num_episodes, method, display, save_rate, agents_save_path,
+          train_result_path)
+
+def evaluate(env, is_env_multiagent, agents, max_episode_len, num_episodes, display, save_rate, agents_save_path, train_result_path):
+    method = 'evaluate'
+    run(env, is_env_multiagent, agents, max_episode_len, num_episodes, method, display, save_rate, agents_save_path,
+          train_result_path)
+
+def run(env, is_env_multiagent, agents, max_episode_len, num_episodes, method, display, save_rate, agents_save_path, train_result_path):
+
+    if agents_save_path: import dill # used to save the agents themselves, pickle bad at serializing objecst
     if train_result_path: import pickle 
 
     episode_rewards = [0.0]

@@ -70,7 +70,8 @@ class PolicyGradientAgent(object):
 
     def compute_gradient(self, probs, state, action):
         """ Computes the gradient of log(softmax) for a state and action """
-        dsoftmax = self.softmax_gradient(probs)[action, :]
+        dsoftmax_comp = self.softmax_gradient(probs)
+        dsoftmax = dsoftmax_comp[action, :]
         dlog = dsoftmax / probs[0, action]
         grad = state.T.dot(dlog[None, :])
 
@@ -157,18 +158,18 @@ def test_continuous_single_agent():
     import gym
     env = gym.make('CartPole-v0')
     num_actions = env.action_space.n
-    num_states = env.observation_space.shape[0]
-    theta = np.random.rand(num_states, num_actions)
+    num_states_vars = env.observation_space.shape[0]
+    theta = np.random.rand(num_states_vars, num_actions)
 
-    pg_agent = PolicyGradientAgent(num_actions, theta, alpha=0.00025, gamma=0.9, mapping_fn=None)
+    pg_agent = PolicyGradientAgent(num_actions, theta, alpha=0.025, gamma=0.9, mapping_fn=None)
 
-    import train
-    train.train(env=env, is_env_multiagent=False, agents=[pg_agent], max_episode_len=10000, num_episodes=10000,
-                method='train', display=False, save_rate=10, agents_save_path="", train_result_path="")
+    import train_and_evaluate
+    train_and_evaluate.train(env=env, is_env_multiagent=False, agents=[pg_agent], max_episode_len=100, num_episodes=1000, display=False, save_rate=10, agents_save_path="", train_result_path="")
 
+    train_and_evaluate.evaluate(env=env, is_env_multiagent=False, agents=[pg_agent], max_episode_len=100, num_episodes=100, display=True, save_rate=10, agents_save_path="", train_result_path="")
 
 def test_continuous_multi_agent():
-    import train
+    import train_and_evaluate
     #A simple multi-agent particle world with a continuous observation and discrete action space, along with some basic simulated physics.
     # Used in the paper [Multi-Agent Actor-Critic for Mixed Cooperative-Competitive Environments](https://arxiv.org/pdf/1706.02275.pdf)
     # the code for the environment can be found in https://github.com/openai/multiagent-particle-envs
@@ -181,10 +182,10 @@ def test_continuous_multi_agent():
     agent2 = PolicyGradientAgent(num_actions=5, theta=np.random.rand(11, 5), action_return_format="vector")  # listener
 
     # run train
-    train.train(env=env, is_env_multiagent=True, agents=[agent1, agent2], max_episode_len=25, num_episodes=10000,
-                method='train', display=False, save_rate=10, agents_save_path="", train_result_path="")
-
+    train_and_evaluate.train(env=env, is_env_multiagent=True, agents=[agent1, agent2], max_episode_len=25, num_episodes=10000, display=True, save_rate=10, agents_save_path="", train_result_path="")
+    # evaluate performance
+    train_and_evaluate.evaluate(env=env, is_env_multiagent=True, agents=[agent1, agent2], max_episode_len=25, num_episodes=100, display=True, save_rate=10, agents_save_path="", train_result_path="")
 
 if __name__ == "__main__":
-    #test_continuous_single_agent()
-    test_continuous_multi_agent()
+    test_continuous_single_agent()
+    #test_continuous_multi_agent()
