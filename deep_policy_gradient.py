@@ -14,21 +14,23 @@ TODO: add option to use cnn instead of fc (e.g. pixel env)
 TODO: check if working
 """
 
-import torch as T 
-import torch.nn as nn 
-import torch.nn.functional as F 
-import torch.optim as optim 
-import numpy as np 
+import torch as T
+import torch.nn as nn
+import torch.nn.functional as F
+import torch.optim as optim
+import numpy as np
+from learning_agent import RL_Agent
 
-class PolicyNetwork(nn.Module): # The network itself is separate from the agent
+
+class PolicyNetwork(nn.Module):  # The network itself is separate from the agent
     def __init__(self, learning_rate, input_dims, fc1_dims, fc2_dims, num_actions, mapping_fn=None):
         super(PolicyNetwork, self).__init__()
 
-        self.input_dims = input_dims 
+        self.input_dims = input_dims
         self.learning_rate = learning_rate
-        self.fc1_dims = fc1_dims 
+        self.fc1_dims = fc1_dims
         self.fc2_dims = fc2_dims
-        self.num_actions = num_actions 
+        self.num_actions = num_actions
         self.mapping_fn = mapping_fn
 
         self.fc1 = nn.Linear(self.input_dims, self.fc2_dims)
@@ -41,7 +43,7 @@ class PolicyNetwork(nn.Module): # The network itself is separate from the agent
 
     def forward(self, observation):
         if self.mapping_fn:
-            observation = self.mapping_fn(observation) 
+            observation = self.mapping_fn(observation)
 
         state = T.Tensor(observation).to(self.device)
         x = F.relu(self.fc1(state))
@@ -49,54 +51,54 @@ class PolicyNetwork(nn.Module): # The network itself is separate from the agent
         x = self.fc3(x)
 
         return x
-    
-class DPGAgent(object):
-    def __init__(self, learning_rate, input_dims, num_actions, gamma=0.99, l1_size=256, l2_size=256, mapping_fn=None, action_return_format=None):
-        self.gamma = gamma 
-        self.reward_mem = [] 
-        self.action_mem = [] 
-        self.num_actions = num_actions
-        self.gamma = gamma
+
+
+class DPGAgent(RL_Agent):
+    def __init__(self, learning_rate, input_dims, num_actions, theta, gamma=0.99, l1_size=256, l2_size=256,
+                 mapping_fn=None, action_return_format=None):
+        super().__init__(num_actions, theta, alpha=0.00025, gamma=gamma, mapping_fn=mapping_fn)
+        self.reward_mem = []
+        self.action_mem = []
         self.policy = PolicyNetwork(learning_rate, input_dims, l1_size, l2_size, num_actions, mapping_fn)
         self.action_return_format = action_return_format
-
 
     def int_to_vector(self, action):
         """ Turns integer action into one hot vector """
         vec = np.zeros(self.num_actions)
-        vec[action] = 1 
-        return vec 
-    
+        vec[action] = 1
+        return vec
+
     def learn(self):
         """ Calculate rewards for the episode, compute the gradient of the loss, update optimizer"""
         self.policy.optimizer.zero_grad()
         G = np.zeros_like(self.reward_mem, dtype=np.float64)
 
         for t in range(len(self.reward_mem)):
-            G_sum = 0 
+            G_sum = 0
             discount = 1
 
             for k in range(t, len(self.reward_mem)):
                 G_sum += self.reward_mem[k] * discount
-                discount *= self.gamma 
-            G[t] = G_sum 
-        
-        # standardize updates
+                discount *= self.gamma
+            G[t] = G_sum
+
+            # standardize updates
         mean = np.mean(G)
         std = np.std(G) if np.std(G) > 0 else 1
-        G = (G-mean)/std 
+        G = (G - mean) / std
 
         G = T.tensor(G, dtype=T.float).to(self.policy.device)
         loss = 0
 
         for g, logprob in zip(G, self.action_mem):
-            loss += -g * logprob 
-        
+            loss += -g * logprob
+
         loss.backward()
 
         self.policy.optimizer.step()
 
     """ Training Callbacks """
+
     def action_callback(self, observation):
         probs = F.softmax(self.policy.forward(observation))
         action_probs = T.distributions.Categorical(probs)
@@ -109,7 +111,7 @@ class DPGAgent(object):
         if self.action_return_format == 'vector':
             returned_action = self.int_to_vector(returned_action)
 
-        #return action.item()
+        # return action.item()
         return returned_action
 
     def experience_callback(self, obs, action, new_obs, reward, done):
@@ -117,24 +119,24 @@ class DPGAgent(object):
 
     def episode_callback(self):
         """ Reset at the end of an episode"""
-        self.learn() 
-        self.reward_mem = [] 
-        self.action_mem = [] 
-    
+        self.learn()
+        self.reward_mem = []
+        self.action_mem = []
+
     """ Evaluation Callbacks """
+
     def policy_callback(self, observation):
         probs = F.softmax(self.policy.forward(observation))
         action_probs = T.distributions.Categorical(probs)
         action = action_probs.sample()
-        
-        return action.item() 
-    
+
+        return action.item()
+
     def reset(self):
         return
 
 
 def test_continuous_single_agent():
-
     import gym
     env = gym.make('CartPole-v0')
     num_actions = env.action_space.n
@@ -144,34 +146,37 @@ def test_continuous_single_agent():
 
     dpg_agent = DPGAgent(learning_rate, num_states, num_actions, gamma=0.99, l1_size=256, l2_size=256, mapping_fn=None)
 
-    import train
-    train.train(env=env, is_env_multiagent=False, agents=[dpg_agent], max_episode_len=10000, num_episodes=10000,
-                method='train', display=False, save_rate=10, agents_save_path="", train_result_path="")
+    import train_and_evaluate
+    train_and_evaluate.train(env=env, is_env_multiagent=False, agents=[dpg_agent], max_episode_len=10000,
+                             num_episodes=10000, display=False, save_rate=10, agents_save_path="", train_result_path="")
 
 
 def test_continuous_multi_agent():
-    import train
-    #A simple multi-agent particle world with a continuous observation and discrete action space, along with some basic simulated physics.
+    import train_and_evaluate
+    # A simple multi-agent particle world with a continuous observation and discrete action space, along with some basic simulated physics.
     # Used in the paper [Multi-Agent Actor-Critic for Mixed Cooperative-Competitive Environments](https://arxiv.org/pdf/1706.02275.pdf)
     # the code for the environment can be found in https://github.com/openai/multiagent-particle-envs
     import sys
     sys.path.append("../particle_env")
-    #import particle_env
+    # import particle_env
     from make_env import make_env
     env = make_env('simple_speaker_listener')
-
 
     # init agents
     learning_rate = 0.01
 
-    dpg_agent_speaker = DPGAgent(learning_rate, input_dims=3, num_actions=3, gamma=0.99, l1_size=256, l2_size=256, mapping_fn=None, action_return_format="vector")
-    dpg_agent_listener = DPGAgent(learning_rate, input_dims=11, num_actions=5, gamma=0.99, l1_size=256, l2_size=256,mapping_fn=None, action_return_format="vector")
+    dpg_agent_speaker = DPGAgent(learning_rate, input_dims=3, num_actions=3, gamma=0.99, l1_size=256, l2_size=256,
+                                 mapping_fn=None, action_return_format="vector")
+    dpg_agent_listener = DPGAgent(learning_rate, input_dims=11, num_actions=5, gamma=0.99, l1_size=256, l2_size=256,
+                                  mapping_fn=None, action_return_format="vector")
 
     # run train
-    train.train(env=env, is_env_multiagent=True, agents=[dpg_agent_speaker, dpg_agent_listener], max_episode_len=25, num_episodes=10000,
-                method='train', display=False, save_rate=10, agents_save_path="", train_result_path="")
+    train_and_evaluate.train(env=env, is_env_multiagent=True, agents=[dpg_agent_speaker, dpg_agent_listener],
+                             max_episode_len=25,
+                             num_episodes=10000,
+                             display=False, save_rate=10, agents_save_path="", train_result_path="")
 
 
 if __name__ == "__main__":
-    #test_continuous_single_agent()
-    test_continuous_multi_agent()
+    test_continuous_single_agent()
+    # test_continuous_multi_agent()

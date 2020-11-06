@@ -1,3 +1,4 @@
+from learning_agent import RL_Agent
 import numpy as np
 import sys
 
@@ -26,21 +27,15 @@ Actions and gradients derived according to softmax distribution (13.2)
 """
 
 
-class PolicyGradientAgent(object):
+class PolicyGradientAgent(RL_Agent):
     """ Generic Policy Gradient Implementation """
 
-    def __init__(self, num_actions, theta, alpha=0.00025, gamma=0.9, mapping_fn=None, action_return_format=None):
-        """ Parameters """
-        self.theta = theta
-        self.alpha = alpha
-        self.gamma = gamma
-
+    def __init__(self, action_return_format=None, **args):
+        super().__init__(**args)
         """ Record keeping / episode """
         self.grads = []
         self.rewards = []
 
-        self.mapping_fn = mapping_fn
-        self.num_actions = num_actions
         # environment may want vector instead. Can define on environment but it has some consequences depending on which
         # environment you are working with. This may be a bit more general, but should think about whether it is better on the
         # environment.
@@ -138,7 +133,7 @@ class PolicyGradientAgent(object):
 
 def test_discrete():
     import gym
-    env = gym.make("Taxi-v2").env  # policy gradient not well suited to taxi env. should work but may take long time
+    env = gym.make("Taxi-v3").env  # policy gradient not well suited to taxi env. should work but may take long time
     env.reset()
     env.render()
 
@@ -146,12 +141,12 @@ def test_discrete():
     num_states = env.observation_space.n
     theta = np.random.rand(num_states, num_actions)
 
-    pg_agent = PolicyGradientAgent(num_actions, theta, alpha=0.025, gamma=0.9,
+    pg_agent = PolicyGradientAgent(num_actions=num_actions, theta=theta, alpha=0.025, gamma=0.9,
                                    mapping_fn=lambda x: np.squeeze(np.eye(500)[np.array(x).reshape(-1)]) / 500)
 
-    import train
-    train.train(env=env, is_env_multiagent=False, agents=[pg_agent], max_episode_len=10000, num_episodes=1000,
-                method='train', display=False, save_rate=1, agents_save_path="", train_result_path="")
+    import train_and_evaluate
+    train_and_evaluate.train(env=env, is_env_multiagent=False, agents=[pg_agent], max_episode_len=10000, num_episodes=1000,
+                display=False, save_rate=1, agents_save_path="", train_result_path="")
 
 
 def test_continuous_single_agent():
@@ -160,21 +155,23 @@ def test_continuous_single_agent():
     num_actions = env.action_space.n
     num_states_vars = env.observation_space.shape[0]
     theta = np.random.rand(num_states_vars, num_actions)
-
-    pg_agent = PolicyGradientAgent(num_actions, theta, alpha=0.025, gamma=0.9, mapping_fn=None)
+    pg_agent = PolicyGradientAgent(num_actions=num_actions, theta=theta, alpha=0.025, gamma=0.9, mapping_fn=None)
 
     import train_and_evaluate
-    train_and_evaluate.train(env=env, is_env_multiagent=False, agents=[pg_agent], max_episode_len=100, num_episodes=1000, display=False, save_rate=10, agents_save_path="", train_result_path="")
+    train_and_evaluate.train(env=env, is_env_multiagent=False, agents=[pg_agent], max_episode_len=100,
+                             num_episodes=1000, display=False, save_rate=10, agents_save_path="", train_result_path="")
 
-    train_and_evaluate.evaluate(env=env, is_env_multiagent=False, agents=[pg_agent], max_episode_len=100, num_episodes=100, display=True, save_rate=10, agents_save_path="", train_result_path="")
+    train_and_evaluate.evaluate(env=env, is_env_multiagent=False, agents=[pg_agent], max_episode_len=100,
+                                num_episodes=100, display=True, save_rate=10, agents_save_path="", train_result_path="")
+
 
 def test_continuous_multi_agent():
     import train_and_evaluate
-    #A simple multi-agent particle world with a continuous observation and discrete action space, along with some basic simulated physics.
+    # A simple multi-agent particle world with a continuous observation and discrete action space, along with some basic simulated physics.
     # Used in the paper [Multi-Agent Actor-Critic for Mixed Cooperative-Competitive Environments](https://arxiv.org/pdf/1706.02275.pdf)
     # the code for the environment can be found in https://github.com/openai/multiagent-particle-envs
     sys.path.append("../particle_env")
-    #import particle_env
+    # import particle_env
     from make_env import make_env
     env = make_env('simple_speaker_listener')
     # init agents
@@ -182,10 +179,14 @@ def test_continuous_multi_agent():
     agent2 = PolicyGradientAgent(num_actions=5, theta=np.random.rand(11, 5), action_return_format="vector")  # listener
 
     # run train
-    train_and_evaluate.train(env=env, is_env_multiagent=True, agents=[agent1, agent2], max_episode_len=25, num_episodes=10000, display=True, save_rate=10, agents_save_path="", train_result_path="")
+    train_and_evaluate.train(env=env, is_env_multiagent=True, agents=[agent1, agent2], max_episode_len=25,
+                             num_episodes=10000, display=True, save_rate=10, agents_save_path="", train_result_path="")
     # evaluate performance
-    train_and_evaluate.evaluate(env=env, is_env_multiagent=True, agents=[agent1, agent2], max_episode_len=25, num_episodes=100, display=True, save_rate=10, agents_save_path="", train_result_path="")
+    train_and_evaluate.evaluate(env=env, is_env_multiagent=True, agents=[agent1, agent2], max_episode_len=25,
+                                num_episodes=100, display=True, save_rate=10, agents_save_path="", train_result_path="")
+
 
 if __name__ == "__main__":
-    test_continuous_single_agent()
-    #test_continuous_multi_agent()
+    test_discrete()
+    # test_continuous_single_agent()
+    # test_continuous_multi_agent()
