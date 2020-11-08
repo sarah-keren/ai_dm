@@ -79,6 +79,8 @@ class TDAgent(RL_Agent, ABC):
             self.alpha = 0.0  # no learning
 
     def get_legal_actions(self, state):
+        if self.num_actions == 6:
+            return [i for i in range(6)]
         if state == TERMINAL_STATE:
             return ()
         elif state in self.terminal_states:

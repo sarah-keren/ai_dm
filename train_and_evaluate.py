@@ -112,7 +112,7 @@ def evaluate(env, is_env_multiagent, agents, max_episode_len, num_episodes, disp
 
 def run(env, is_env_multiagent, agents, max_episode_len, num_episodes, method, display, save_rate, agents_save_path,
         train_result_path):
-    if agents_save_path: import dill  # used to save the agents themselves, pickle bad at serializing objecst
+    if agents_save_path: import dill  # used to save the agents themselves, pickle bad at serializing object
     if train_result_path: import pickle
 
     episode_rewards = [0.0]

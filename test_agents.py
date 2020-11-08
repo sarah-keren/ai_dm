@@ -1,3 +1,4 @@
+from environments.abstractions.taxi_abstractions import *
 from td_agents import *
 from mc_agents import *
 from environments.gridworld.gridworld_utils import *
@@ -27,12 +28,13 @@ def get_discrete_environment(env_name):
         return gym.make("Taxi-v3").env
     elif env_name == GRID_WORLD:
         return get_grid_world()
+    elif env_name == TAXI_MODEL_IRRELEVANCE_ABSTRACTION:
+        return TaxiModelIrrelevanceAbstraction()
     else:
         print("Invalid environment name")
 
 
-def test_discrete(agent_name):
-    world = GRID_WORLD
+def test_discrete(agent_name, world):
     env = get_discrete_environment(world)
 
     num_actions = env.action_space.n
@@ -45,8 +47,6 @@ def test_discrete(agent_name):
     env.reset()
     env.render()
 
-
-
     import train_and_evaluate
     train_and_evaluate.train(env=env, is_env_multiagent=False, agents=[agent], max_episode_len=10000, num_episodes=1000,
                              display=DISPLAY, save_rate=1, agents_save_path="", train_result_path="")
@@ -57,11 +57,15 @@ def test_discrete(agent_name):
 
 if __name__ == "__main__":
     """ 
-    Options in agent_utils: 
-        Q_LEARNING_AGENT, 
-        SARSA_AGENT,   
-        MONTE_CARLO_ON_POLICY, 
-        MONTE_CARLO_OFF_POLICY
+    Options for cur_agent_name: 
+        - Q_LEARNING_AGENT
+        - SARSA_AGENT
+        - MONTE_CARLO_ON_POLICY
+        - MONTE_CARLO_OFF_POLICY
+    Options for env_name:
+        - TAXI
+        - GRID_WORLD
     """
     cur_agent_name = Q_LEARNING_AGENT
-    test_discrete(cur_agent_name)
+    env_name = TAXI_MODEL_IRRELEVANCE_ABSTRACTION
+    test_discrete(cur_agent_name, env_name)

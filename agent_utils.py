@@ -7,7 +7,8 @@ MONTE_CARLO_ON_POLICY = "mc_on_policy"
 MONTE_CARLO_OFF_POLICY = "mc_off_policy"
 # ====================== env ===================== #
 TAXI = "taxi"
-GRID_WORLD = "grid world"
+GRID_WORLD = "grid_world"
+TAXI_MODEL_IRRELEVANCE_ABSTRACTION = "taxi_model_irrelevance_abstraction"
 # ====================== params ===================== #
 GAMMA = 0.9  # ............. -d : discount factor, default=0.9
 LIVING_REWARD = -1  # ...... -r : Reward for living for a time step, default=0.0

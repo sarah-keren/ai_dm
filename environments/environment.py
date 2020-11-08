@@ -1,11 +1,37 @@
 from abc import ABC, abstractmethod
 
 
-class Environment:
+class AbstractEnvironment(ABC):
+    @abstractmethod
+    def reset(self):
+        """
+          Resets the current state to the start state
+        """
+        pass
+
+    @abstractmethod
+    def render(self):
+        """
+        Renders the environment.
+        """
+        pass
+
+    @abstractmethod
+    def step(self, action):
+        """
+          Performs the given action in the current
+          environment state and updates the environment.
+
+          Returns (new_obs, reward, done, info)
+        """
+        pass
+
+
+class Environment(AbstractEnvironment):
     @abstractmethod
     def get_current_state(self):
         """
-        Returns the current state of enviornment
+        Returns the current state of environment
         """
         pass
 
@@ -16,23 +42,6 @@ class Environment:
           can take in the given state. Can
           return the empty list if we are in
           a terminal state.
-        """
-        pass
-
-    @abstractmethod
-    def step(self, action):
-        """
-          Performs the given action in the current
-          environment state and updates the enviornment.
-
-          Returns a (reward, nextState) pair
-        """
-        pass
-
-    @abstractmethod
-    def reset(self):
-        """
-          Resets the current state to the start state
         """
         pass
 
