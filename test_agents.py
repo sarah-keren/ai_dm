@@ -25,15 +25,15 @@ def get_agent(agent_name, num_actions, theta, env):
 def get_discrete_environment(env_name, transform_env=False, mapping_class=None):
     if not transform_env:
         if env_name == TAXI:
-            return TransformEnvironment(False, env_name)
+            return TransformEnvironment(env_name)
         elif env_name == CLIFF_WALKING:
-            return TransformEnvironment(False, env_name)
+            return TransformEnvironment(env_name)
         elif env_name == MANUAL:
             return get_grid_world()
     elif transform_env:
         if not mapping_class:
             raise Exception("Using a transform environment without mapping_fn")
-        return TransformEnvironment(False, env_name, mapping_class)
+        return TransformEnvironment(env_name, mapping_class)
     else:
         print("Invalid environment name")
 
