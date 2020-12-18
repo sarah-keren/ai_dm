@@ -84,9 +84,9 @@ class PolicyGradientAgent(RL_Agent):
     """ Training Callbacks """
 
     def action_callback(self, state):
-        """ Take an action according to policy. Save gradient."""
+        """ Take an action according to policy. Save gradient. Should use transform_fn if it exist."""
         if self.mapping_fn:
-            state = self.mapping_fn(state)
+            state = self.mapping_fn(state, self.num_actions)
 
         state = state[None, :]
         probs = self.policy(state)

@@ -38,8 +38,11 @@ class TDAgent(RL_Agent, ABC):
           Computes the action to take in the current state.  With
           probability self.epsilon, we should take a random action and
           take the best policy action otherwise.
+          Should use transform_fn if it exist.
         """
         actions = self.get_legal_actions(state)
+        # if self.mapping_fn:
+        #     return self.mapping_fn(state, actions)
         if len(actions) == 0:  # there are no possible actions
             return None
         if flip_coin(self.epsilon):
@@ -79,8 +82,8 @@ class TDAgent(RL_Agent, ABC):
             self.alpha = 0.0  # no learning
 
     def get_legal_actions(self, state):
-        if self.num_actions == 6:
-            return [i for i in range(6)]
+        if self.num_actions == 6 or self.num_actions == 4:
+            return [i for i in range(self.num_actions)]
         if state == TERMINAL_STATE:
             return ()
         elif state in self.terminal_states:

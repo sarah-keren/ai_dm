@@ -20,7 +20,6 @@ TERMINAL_STATE = 'TERMINAL_STATE'
 CLIFF_GRID = [[' ', ' ', ' '],
               [' ', ' ', ' '],
               [' ', ' ', ' '],
-              [' ', ' ', ' '],
               ['S', -100, 100]]
 
 # CLIFF_GRID = [[' ', ' ', ' ', ' ', ' '],

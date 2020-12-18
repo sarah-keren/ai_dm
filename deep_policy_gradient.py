@@ -100,6 +100,10 @@ class DPGAgent(RL_Agent):
     """ Training Callbacks """
 
     def action_callback(self, observation):
+        """
+        Chooses an action and return it.
+        Should use transform_fn if it exist.
+        """
         probs = F.softmax(self.policy.forward(observation))
         action_probs = T.distributions.Categorical(probs)
         action = action_probs.sample()

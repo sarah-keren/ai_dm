@@ -27,6 +27,7 @@ class RL_Agent(ABC):
     def action_callback(self, state):
         """
         Chooses an action and return it.
+        Should use transform_fn if it exist.
         """
         pass
 

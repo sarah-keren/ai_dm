@@ -1,6 +1,7 @@
 import numpy as np
 import time
 import pickle as pickle
+import matplotlib.pyplot as plt
 
 """ 
 Functions in this file:
@@ -41,6 +42,7 @@ def run_episode_single_agent(env, agent, max_episode_len, method, display):
 
         action = agent.action_callback(obs)
         new_obs, reward, done, info = env.step(action)
+        print(new_obs, reward, done, info)
 
         if method == 'train':
             agent.experience_callback(obs, action, new_obs, reward, done)
@@ -175,9 +177,15 @@ def run(env, is_env_multiagent, agents, max_episode_len, num_episodes, method, d
 
     print("Finished a total of {} episodes.".format(len(episode_rewards)))
 
+
     if agents_save_path:
         print("Agent saved to {}.".format(agents_save_path))
 
     if train_result_path:
         # final_ep_rewards, final_ag_rewards, episode_rewards, agent_rewards 
         print("Train results saved to {}.".format(train_result_path))
+
+    plt.plot([i for i in range(len(episode_rewards))], episode_rewards)
+    plt.xlabel('episodes')
+    plt.ylabel('rewards')
+    plt.show()

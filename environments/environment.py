@@ -45,7 +45,6 @@ class Environment(AbstractEnvironment):
         """
         pass
 
-    @abstractmethod
     def is_terminal(self):
         """
           Has the environment entered a terminal
