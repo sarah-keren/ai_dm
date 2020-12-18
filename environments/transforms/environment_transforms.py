@@ -60,14 +60,14 @@ class MappingFunction(ABC):
         """
         pass
 
-
-class AllOutcomeDeterminization(MappingFunction):
-    def __init__(self, env):
-        super().__init__(env)
-        self._mapping_dict = {}
-
-    def mapping_step(self, state, action):
-        pass
+    def _get_transition_info(self, state, action):
+        transitions = self._env.P[state][action]
+        if len(transitions) == 1:
+            i = 0
+        else:
+            i = self._env.categorical_sample([t[0] for t in transitions], self._env.np_random)
+        p, s, r, d = transitions[i]
+        return p, s, r, d
 
 
 class ModelIrrelevanceMapping(MappingFunction):
@@ -77,8 +77,7 @@ class ModelIrrelevanceMapping(MappingFunction):
         self._init_mapping_dict()
 
     def mapping_step(self, state, action):
-        transitions = self._env.P[state][action]
-        prob, new_obs, reward, done = transitions[0]
+        prob, new_obs, reward, done = self._get_transition_info(state, action)
         abstract_new_obs = self._mapping_dict[new_obs]
         return abstract_new_obs
 
@@ -91,9 +90,11 @@ class ModelIrrelevanceMapping(MappingFunction):
         temp_mapping_dict = {}
         states = len(self._env.P.keys())
         for s1 in range(states):
-            temp_mapping_dict[s1] = OrderedSet([s1])
+            if s1 not in temp_mapping_dict:
+                temp_mapping_dict[s1] = OrderedSet([s1])
             for s2 in range(s1 + 1, states):
-                temp_mapping_dict[s2] = OrderedSet([s2])
+                if s2 not in temp_mapping_dict:
+                    temp_mapping_dict[s2] = OrderedSet([s2])
                 not_equal_rewards = False
                 for a in range(actions):
                     if self._get_reward(s1, a) != self._get_reward(s2, a):
@@ -101,7 +102,8 @@ class ModelIrrelevanceMapping(MappingFunction):
                         break
                 if not_equal_rewards:
                     continue
-                self._update_temp_mapping_dict(s1, s2, temp_mapping_dict)
+                temp_mapping_dict[s1].add(s2)
+                temp_mapping_dict[s2].add(s1)
         return temp_mapping_dict
 
     def _map_states_with_equal_probabilities(self, actions, temp_mapping_dict):
@@ -109,18 +111,14 @@ class ModelIrrelevanceMapping(MappingFunction):
             set_probs = self._get_set_probabilities(s_set, actions)
             set_probs = dict(sorted(set_probs.items(), key=lambda x: x[1]))
             for k, group in groupby(set_probs.items(), key=lambda x: x[1]):
-                group = list(group)
                 for item in group:
-                    self._mapping_dict[item[0]] = group[0][0]
+                    group = list(group)
+                    if len(group) > 0:
+                        self._mapping_dict[item[0]] = group[0][0]
 
     def _get_reward(self, state, action):
-        transitions = self._env.P[state][action]
-        p, s, r, d = transitions[0]
+        p, s, r, d = self._get_transition_info(state, action)
         return r
-
-    def _update_temp_mapping_dict(self, s1, s2, temp_mapping_dict):
-        temp_mapping_dict[s1].add(s2)
-        temp_mapping_dict[s2].add(s1)
 
     def _get_set_probabilities(self, s_set, actions):
         set_probs = {}
@@ -134,6 +132,40 @@ class ModelIrrelevanceMapping(MappingFunction):
         return set_probs
 
     def _get_next_s(self, state, action):
-        transitions = self._env.P[state][action]
-        p, s, r, d = transitions[0]
+        p, s, r, d = self._get_transition_info(state, action)
         return s
+
+
+class DimReductionMapping(MappingFunction):
+    def __init__(self, env, reduction_idx=0):
+        super().__init__(env)
+        self.reduction_idx = reduction_idx
+        self._mapping_dict = {}
+        self._init_mapping_dict()
+
+    def mapping_step(self, state, action):
+        prob, new_obs, reward, done = self._get_transition_info(state, action)
+        abstract_new_obs = self._mapping_dict[new_obs]
+        return abstract_new_obs
+
+    def _init_mapping_dict(self):
+        states = len(self._env.P.keys())
+        for s1 in range(states):
+            if s1 not in self._mapping_dict:
+                self._mapping_dict[s1] = OrderedSet([s1])
+            for s2 in range(s1 + 1, states):
+                if s2 not in self._mapping_dict:
+                    self._mapping_dict[s2] = OrderedSet([s2])
+                if self._the_same_abstract_state(s1, s2):
+                    self._mapping_dict[s1].add(s2)
+                    self._mapping_dict[s2].add(s1)
+        self._mapping_dict = {k: v._set.pop() for k, v in self._mapping_dict.items()}
+
+    def _the_same_abstract_state(self, s1, s2):
+        state_1 = list(self._env.decode(s1))
+        state_2 = list(self._env.decode(s2))
+        state_idx = [i for i in range(len(state_1)) if i != self.reduction_idx]
+        for idx in state_idx:
+            if state_1[idx] != state_2[idx]:
+                return False
+        return True
