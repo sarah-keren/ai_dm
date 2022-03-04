@@ -246,8 +246,8 @@ class Taxi_Processor:
 def test_taxi():
 
     import gym
-    from test_utils import Taxi_Expert
-    from test_utils import Taxi_Processor
+    from Tests.test_utils import Taxi_Expert
+    from Tests.test_utils import Taxi_Processor
 
     env = gym.make("Taxi-v3").env
     env.reset()
