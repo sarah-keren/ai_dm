@@ -173,5 +173,5 @@ def test_continuous_multi_agent():
 
 
 if __name__ == "__main__":
-    #test_continuous_single_agent()
-    test_continuous_multi_agent()
+    test_continuous_single_agent()
+    #test_continuous_multi_agent()

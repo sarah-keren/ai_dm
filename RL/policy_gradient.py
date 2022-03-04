@@ -187,5 +187,5 @@ def test_continuous_multi_agent():
     train_and_evaluate.evaluate(env=env, is_env_multiagent=True, agents=[agent1, agent2], max_episode_len=25, num_episodes=100, display=True, save_rate=10, agents_save_path="", train_result_path="")
 
 if __name__ == "__main__":
-    test_continuous_single_agent()
-    #test_continuous_multi_agent()
+    #test_continuous_single_agent()
+    test_continuous_multi_agent()
