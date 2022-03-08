@@ -1,10 +1,10 @@
 __author__ = 'sarah'
 
-import search
-import defs, time
-import logging
+import Search.search_utils
+import Search.defs
+import logging, time
 
-def best_first_design(umd_problem, frontier,  closed_list = [], termination_criteria = None, prune_func = None, log_file=None, results_log_file= None, iter_limit = defs.NA, time_limit = defs.NA, use_search_node_for_evaluation = False):
+def best_first_search(problem, frontier,  closed_list = [], termination_criteria = None, prune_func = None, log_file=None, iter_limit = defs.NA, time_limit = defs.NA, use_search_node_for_evaluation = False):
 
 
     """Search for the design sequence with the maximal value.
@@ -23,10 +23,10 @@ def best_first_design(umd_problem, frontier,  closed_list = [], termination_crit
        - prune_func - given the successors of a node, the pruning function returns only the nodes to be further explored
     """
 
-    logging.info('Starting: best_first_design')
+    logging.info('Starting: best_first_search')
 
     # init the search node
-    root_node = search.DesignNode(umd_problem.initial_model, None, None,0, umd_problem)
+    root_node = search_utils.Node(problem.initial_state, None, None,0, problem)
     # the frontier sets the order by which nodes are explored (e.g.FIFO, LIFO etc.)
     # we are assuming the root node is valid, i.e., it doesn't violate the design constraints 
     frontier.add(root_node)

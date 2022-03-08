@@ -1,7 +1,5 @@
 import numpy as np
-import sklearn
 from sklearn.ensemble import GradientBoostingClassifier
-import gym
 from queue import Queue
 
 
@@ -246,8 +244,8 @@ class Taxi_Processor:
 def test_taxi():
 
     import gym
-    from Tests.test_utils import Taxi_Expert
-    from Tests.test_utils import Taxi_Processor
+    from Environments.taxi_utils import Taxi_Expert
+    from Environments.taxi_utils import Taxi_Processor
 
     env = gym.make("Taxi-v3").env
     env.reset()

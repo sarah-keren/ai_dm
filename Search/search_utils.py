@@ -15,18 +15,23 @@ class Node:
     an explanation of how the f and h values are handled. You will not need to
     subclass this class."""
 
-    def __init__(self, state, parent, action, path_cost):
+    def __init__(self, state, parent, action, path_cost, value, heuristic_value = None):
         """Create a search tree Node, derived from a parent by an action."""
         self.state = state
         self.parent = parent
         self.action = action
         self.path_cost = path_cost
+        self.value = value
         self.depth = 0
+        self.heuristic_value = heuristic_value
         if parent:
             self.depth = parent.depth + 1
 
     def __repr__(self):
-        return "<Node {}>".format(self.state)
+        node_string = "<Node {}>".format(self.state)
+        if self.heuristic_value:
+            node_string += 'hval:%.2f' % self.heuristic_value
+        return node_string
 
     def __lt__(self, node):
         return self.state < node.state
@@ -92,51 +97,8 @@ class Node:
 # Queues: Stack, FIFOQueue, PriorityQueue
 
 # TODO: queue.PriorityQueue
-# TODO: Priority queues may not belong here -- see treatment in search.py
+# TODO: Priority queues may not belong here -- see treatment in search_utils.py
 
-
-class DesignNode(Node):
-
-    """A node in a design search tree. Similar to a regular generic node, but can return the design actions that lead to it ."""
-
-    def __init__(self, state, parent, action, path_cost, umd_problem):
-        self.umd_problem = umd_problem
-        self.heuristic_value = -1
-        self.value = None
-        """Create a design search tree Node, derived from a parent by a modification."""
-        super().__init__(state, parent, action, path_cost)
-        
-    def __repr__(self):                
-        node_string = "<Node{}>".format(self.transition_path())
-        node_string += 'hval:%.2f'%self.heuristic_value
-        
-        return node_string
-
-    def str_modification_seq(self):
-        node_string = "<Node{}>".format(self.transition_path())
-        #node_string += 'hval:%.2f' % self.heuristic_value
-
-        return node_string
-    def __lt__(self, node):
-        return self.heuristic_value < node.heuristic_value
-    
-    def transition_path(self, str_representation = True):
-        """Return a list of transitions forming the execution path from the root to this node."""
-        node, path_back = self, []
-        while node:
-            modification_name = 'None'
-            if node.action:
-                modification_name = node.action.__str__()
-            if modification_name is not 'None':
-                if(str_representation):
-                    path_back.append(modification_name)
-                else:
-                    path_back.append(node.action)
-            node = node.parent
-        return list(reversed(path_back))
-       
-
-   
 class Queue:
 
     """Queue is an abstract class/interface. There are three types:
