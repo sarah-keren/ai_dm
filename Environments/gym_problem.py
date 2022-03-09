@@ -7,70 +7,47 @@ class GymProblem(Problem):
     """Problem superclass
        supporting COMPLETE
     """
-    def __init__(self, env, constraints=None):
+    def __init__(self, env, constraints=[]):
         super().__init__(env.s, constraints)
         self.env = env
+        self.done = False
 
-    # value of a state
-    def evaluate(self, state):
-        raise NotImplementedError
 
-    # return whether val_a is better then val_b in the domain
-    def is_better(self, val_a, val_b):
-        raise NotImplementedError
+    # value of a node
+    def evaluate(self, node, use_cost_as_value=True):
+        if use_cost_as_value:
+            return node.get_path_cost(self)
+        # use value
+        else:
+            return node.get_path_value(self)
 
-    # is the state valud in the domain
-    def is_valid(self, state):
-
-        # if there are no constraints - return True
-        if self.constraints is None:
-            print('No constraints')
+    # return whether val_a is better or equal to val_b in the domain
+    def is_better_or_equal(self, val_a, val_b):
+        if val_a > val_b or val_a == val_b:
             return True
-        # check all constraints - if one is violated, return False
-        for constraint in self.constraints:
-            if not constraint.is_valid(state):
-                return False
-        # non of the constraints have been violated
-        return True
+        else:
+            return False
+
+    # get the actions that can be applied at the current node
+    def get_applicable_actions(self, node):
+        actions_trans = self.env.P[node.state]
+        return actions_trans
+
+    # apply the action and return the next state
+    def get_successor_state(self, action, state):
+        [prob, next_state, reward, done] = self.env.P[state][action][0]
+        self.done = done
+        return next_state
+
+    def get_action_cost(self, action, state):
+        return 1
+
+    def is_goal_state(self, state):
+        if self.done:
+            return True
+        else:
+            return False
 
 
-    # get all successors for cur_node
-    def successors(self, cur_node, cleanup = True):
 
-        # the state represented by the node
-        cur_state = cur_node.state
-
-        # get the actions that can be applied to this node
-        action_list = self.get_applicable_actions(cur_node)
-        if action_list is None:
-            return None
-
-        # remove the modifications that violate the constraints
-        successor_nodes = []
-        for action in action_list:
-
-            successor_state = action.apply(cur_state)
-            successor_node = search.Node(successor_state, cur_node, action, cur_node.path_cost+action.cost, cur_node.state)
-
-            valid = True
-            # iterate through the constraints to see if the current action or successor states violate them
-            for constraint in self.constraints:
-                if not constraint.is_valid(successor_node, action):
-                    valid = False
-                    break
-
-            # apply the modifications
-            if valid:
-                ''' add the succesor node specifying:
-                    successor_state
-                    cur_node (ancestor)
-                    action (the applied action)
-                    node.path_cost+action.cost (the accumulated cost)
-                '''
-                successor_nodes.append(successor_node)
-
-        if cleanup:
-            cur_state.clean_up()
-
-        return successor_nodes
 

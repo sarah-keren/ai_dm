@@ -1,6 +1,8 @@
 __author__ = 'sarah'
 
 from abc import ABC, abstractmethod
+import Search.utils as utils
+
 
 class Problem (ABC):
 
@@ -8,20 +10,43 @@ class Problem (ABC):
        supporting COMPLETE
     """
 
-    def __init__(self, initial_state, constraints ):
+    def __init__(self, initial_state, constraints):
         self.initial_state = initial_state
         self.constraints = constraints
 
-    # returns the value of a state
+    # returns the value of a node
     @abstractmethod
-    def evaluate(self, state):
+    def evaluate(self, node):
         pass
 
-    # return whether val_a is better then val_b in the domain
-    def is_better(self, val_a, val_b):
-        raise NotImplementedError
+    # return whether val_a is better or equal to val_b in the domain
+    @abstractmethod
+    def is_better_or_equal(self, val_a, val_b):
+        pass
 
-    # is the state valud in the domain
+    # return the actions that are applicable in the current state
+    @abstractmethod
+    def get_applicable_actions(self, node):
+        pass
+
+    # return the successor state that will result from applying the action (without changing the state)
+    @abstractmethod
+    def get_successor_state(self, action, state):
+        pass
+
+    # return the action's cost
+    @abstractmethod
+    def get_action_cost(self, action, state):
+        pass
+
+
+    # does the state represent a goal state
+    @abstractmethod
+    def is_goal_state(self, state):
+        pass
+
+
+    # is the state valid in the domain
     def is_valid(self, state):
 
         # if there are no constraints - return True
@@ -35,10 +60,8 @@ class Problem (ABC):
         # non of the constraints have been violated
         return True
 
-
     # get all successors for cur_node
-    def successors(self, cur_node, cleanup = True):
-
+    def successors(self, cur_node, cleanup=False):
 
         # the state represented by the node
         cur_state = cur_node.state
@@ -52,8 +75,9 @@ class Problem (ABC):
         successor_nodes = []
         for action in action_list:
 
-            successor_state = action.apply(cur_state)
-            successor_node = search.Node(successor_state, cur_node, action, cur_node.path_cost+action.cost, cur_node.state)
+            successor_state = self.get_successor_state(action, cur_state)
+            action_cost = self.get_action_cost(action, cur_state)
+            successor_node = utils.Node(successor_state, cur_node, action, cur_node.path_cost+action_cost, cur_node.state)
 
             valid = True
             # iterate through the constraints to see if the current action or successor states violate them
@@ -62,7 +86,7 @@ class Problem (ABC):
                     valid = False
                     break
 
-            # apply the modifications
+            # apply the action
             if valid:
                 ''' add the succesor node specifying:
                     successor_state

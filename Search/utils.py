@@ -6,8 +6,10 @@ __author__ = 'sarah'
 import collections
 import bisect
 
-class Node:
+from abc import ABC, abstractmethod
 
+
+class Node:
     """A node in a search tree. Contains a pointer to the parent (the node
     that this is a successor of) and to the actual content for this node.
     Also specifies the transtion that got us to this state, and the total path_cost (also known as g) to reach the node.
@@ -15,23 +17,19 @@ class Node:
     an explanation of how the f and h values are handled. You will not need to
     subclass this class."""
 
-    def __init__(self, state, parent, action, path_cost, value, heuristic_value = None):
+    def __init__(self, state, parent, action, path_cost, info=None):
         """Create a search tree Node, derived from a parent by an action."""
         self.state = state
         self.parent = parent
         self.action = action
         self.path_cost = path_cost
-        self.value = value
         self.depth = 0
-        self.heuristic_value = heuristic_value
         if parent:
             self.depth = parent.depth + 1
+        self.info = info
 
     def __repr__(self):
-        node_string = "<Node {}>".format(self.state)
-        if self.heuristic_value:
-            node_string += 'hval:%.2f' % self.heuristic_value
-        return node_string
+        return "<Node {}>".format(self.state)
 
     def __lt__(self, node):
         return self.state < node.state
@@ -59,8 +57,8 @@ class Node:
             path_back.append(node)
             node = node.parent
         return list(reversed(path_back))
-    
-    def transition_path(self):
+
+    def get_transition_path(self):
         """Return a list of transitions forming the execution path from the root to this node."""
         node, path_back = self, []
         while node:
@@ -68,18 +66,40 @@ class Node:
             node = node.parent
         return list(reversed(path_back))
 
-    def cost(self):
-        """Return a list of nodes forming the path from the root to this node."""
+    def get_transition_path_string(self):
+        """Return a list of transitions forming the execution path from the root to this node."""
+        node, path_back = self, []
+        while node:
+            action_name = 'None'
+            if node.action:
+                action_name = node.action.__str__()
+            if action_name is not 'None':
+                path_back.append(action_name)
+
+            node = node.parent
+        return list(reversed(path_back))
+
+    def get_path_cost(self, problem):
+        """Return the total cost of the list of nodes forming the path from the root to this node."""
         node, path_back = self, []
         cost = 0
         while node:
             path_back.append(node)
             if node.action is not None:
-                cost = cost + node.action.cost
+                cost = cost + problem.get_action_cost(node.action, node.state)
             node = node.parent
-        # remove one due to root empty node    
-        #cost = cost-1
         return [cost, list(reversed(path_back))]
+
+    def get_path_value(self, problem):
+        """Return the total value pf the list of states forming the path from the root to this node."""
+        node, path_back = self, []
+        value = 0
+        while node:
+            path_back.append(node)
+            if node.action is not None:
+                value = value + problem.get_action_value(node.action, node.state)
+            node = node.parent
+        return [value, list(reversed(path_back))]
 
     # We want for a queue of nodes in breadth_first_search or
     # astar_search to have no duplicated states, so we treat nodes
@@ -97,7 +117,7 @@ class Node:
 # Queues: Stack, FIFOQueue, PriorityQueue
 
 # TODO: queue.PriorityQueue
-# TODO: Priority queues may not belong here -- see treatment in search_utils.py
+# TODO: Priority queues may not belong here -- see treatment in utils.py
 
 class Queue:
 
@@ -135,7 +155,6 @@ class Queue:
     
     def __repr__(self, key):
         raise NotImplementedError
-    
     
 
 def Stack():
@@ -182,7 +201,6 @@ class FIFOQueue(Queue):
             
         return queue_string
     
-
 
 class PriorityQueue(Queue):
 
@@ -238,21 +256,23 @@ class PriorityQueue(Queue):
         return queue_string
             
 
-    
-class ClosedList():
-    ''' Holding the list of items that have been explored 
-    '''
+class ClosedList(ABC):
+
+    # Holding the list of items that have been explored
+    @abstractmethod
     def __init__(self):
-        raise NotImplementedError
+        pass
 
+    @abstractmethod
     def add(self, node):
-        raise NotImplementedError
+        pass
 
+    @abstractmethod
     def isInList(self, node):
-        raise NotImplementedError  
+        pass
 
 
-class ClosedListOfSequences():
+class ClosedListOfSequences(ClosedList):
     ''' Holding the list of items that have been explored 
     '''
     def __init__(self):
@@ -267,8 +287,9 @@ class ClosedListOfSequences():
             return False
         else:
             return True
-        
-class ClosedListOfSets():
+
+
+class ClosedListOfSets(ClosedList):
     ''' Holding the list of items that have been explored 
     '''
     def __init__(self):
@@ -286,3 +307,43 @@ class ClosedListOfSets():
             return False
         else:
             return True       
+
+
+class TerminationCriteria(ABC):
+
+    @abstractmethod
+    def isTerminal(self, node, value,problem):
+        pass
+
+
+
+class TerminationCriteriaOptimalValue(TerminationCriteria):
+
+    def __init__(self, optimal_value, orSmaller=True):
+        self.optimal_value = optimal_value
+        self.orSmaller = orSmaller
+
+    def isTerminal(self, node, value,problem):
+        if self.orSmaller:
+            if node.value <= self.optimal_value:
+                return True
+            else:
+                return False
+
+        else:  # or bigger
+            if node.value >= self.optimal_value:
+                return True
+            else:
+                return False
+
+    def __str__(self):
+        raise NotImplementedError
+
+
+class TerminationCriteriaGoalStateReached(TerminationCriteria):
+
+    def isTerminal(self, node, value,problem):
+        if problem.is_goal_state(node.state):
+            return True
+        else:
+            return False
