@@ -10,31 +10,16 @@ class GymProblem(Problem):
     def __init__(self, env, constraints=[]):
         super().__init__(env.s, constraints)
         self.env = env
-        self.done = False
-
-
-    # value of a node
-    def evaluate(self, node, use_cost_as_value=True):
-        if use_cost_as_value:
-            return node.get_path_cost(self)
-        # use value
-        else:
-            return node.get_path_value(self)
-
-    # return whether val_a is better or equal to val_b in the domain
-    def is_better_or_equal(self, val_a, val_b):
-        if val_a > val_b or val_a == val_b:
-            return True
-        else:
-            return False
 
     # get the actions that can be applied at the current node
     def get_applicable_actions(self, node):
-        actions_trans = self.env.P[node.state]
-        return actions_trans
+        action_list = self.env.P[node.state.__repr__()].keys()
+        return action_list
 
-    # apply the action and return the next state
-    def get_successor_state(self, action, state):
+    # get (all) succesor states of an action and their
+    def get_successors(self, action, state):
+
+        action_list = self.env.P[state.__repr__()]
         [prob, next_state, reward, done] = self.env.P[state][action][0]
         self.done = done
         return next_state
@@ -43,7 +28,7 @@ class GymProblem(Problem):
         return 1
 
     def is_goal_state(self, state):
-        if self.done:
+        if 0:
             return True
         else:
             return False

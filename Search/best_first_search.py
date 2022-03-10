@@ -26,9 +26,11 @@ def best_first_search(problem, frontier, closed_list = None, termination_criteri
     """
     if log:
         logging.info('Starting: best_first_search')
+        results_log = {}
+        start_time = time.time()
 
     # init the search node
-    root_node = utils.Node(problem.initial_state, None, None, 0)
+    root_node = utils.Node(problem.get_current_state(), None, None, 0)
     # the frontier sets the order by which nodes are explored (e.g.FIFO, LIFO etc.)
     # we are assuming the root node is valid, i.e., it doesn't violate the constraints
     frontier.add(root_node)
@@ -43,20 +45,17 @@ def best_first_search(problem, frontier, closed_list = None, termination_criteri
     # a flag used to indicate that the termination criteria has not yet been reached
     continue_search = True
 
-    results_log = {}
-    start_time = time.time()
-
     # continue while there are still nodes to explore and the termination condition has not been met
     ex_terminated = False
 
     try:
 
         while not frontier.isEmpty() and continue_search:
+
+            # count explored nodes
             explored_count += 1
 
-            if log:
-                log_string = 'InMethod best_first_design(node): explored_count:%d'%explored_count
-
+            # check resource limit has not been reached
             if defs.NA != iter_limit and explored_count > iter_limit:
                 ex_terminated = True
                 break
@@ -71,6 +70,8 @@ def best_first_search(problem, frontier, closed_list = None, termination_criteri
             # get the current node
             cur_node = frontier.extract()
             if log:
+                log_string = 'InMethod best_first_design(node): explored_count:%d' % explored_count
+
                 log_string += ' cur_node:%s'%cur_node
                 if log_file:
                     logging.info('best_first_design(node) node number %d cur_node:%s' % (explored_count,cur_node))
@@ -83,7 +84,6 @@ def best_first_search(problem, frontier, closed_list = None, termination_criteri
 
             # verify the model is valid (this is done here to support non-persistent model (i.e. models where non-valid modification sequences can be a prefix of valid ones)
             # and update the best value found so far
-
             start_time_evaluate = time.time()
             cur_value = problem.evaluate(cur_node)
 
@@ -114,7 +114,7 @@ def best_first_search(problem, frontier, closed_list = None, termination_criteri
             # if pruning is applied - prune the set of successors
             start_time_prune = time.time()
             if prune_func is not None:
-                succs = prune_func(succs,cur_node)
+                succs = prune_func(succs, cur_node)
             log_string += ', prun_func_time:%.3f' %(time.time() - start_time_prune)
 
             # sort succesors to make sure goal is reached at the same time for all approaches

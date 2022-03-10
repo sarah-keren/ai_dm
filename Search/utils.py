@@ -29,7 +29,7 @@ class Node:
         self.info = info
 
     def __repr__(self):
-        return "<Node {}>".format(self.state)
+        return "<Node {}>".format(self.state.__str__())
 
     def __lt__(self, node):
         return self.state < node.state
