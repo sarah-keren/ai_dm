@@ -366,3 +366,24 @@ class TerminationCriteriaGoalStateReached(TerminationCriteria):
             return True
         else:
             return False
+
+
+class EvaluationCriteria(ABC):
+
+    @abstractmethod
+    def is_better_or_equal(self, value_a, node_a, value_b, node_b, problem):
+        pass
+
+
+class EvaluationCriteriaGoalCondition(EvaluationCriteria):
+
+    def is_better_or_equal(self, value_a, node_a, value_b, node_b, problem):
+
+        if node_a.state.is_terminal:
+            if not node_b or not node_b.state.is_terminal or node_b.state.is_terminal and problem.is_better_or_equal(value_a, value_b) :
+                return True
+
+        return False
+
+    def __str__(self):
+        raise NotImplementedError

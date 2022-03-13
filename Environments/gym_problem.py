@@ -8,9 +8,10 @@ class GymProblem(Problem):
     """Problem superclass
        supporting COMPLETE
     """
-    def __init__(self, env, constraints=[]):
-        super().__init__(env.s, constraints)
+    def __init__(self, env, init_state, constraints=[]):
+        super().__init__(init_state, constraints)
         self.env = env
+        self.counter = 0
 
     # get the actions that can be applied at the current node
     def get_applicable_actions(self, node):
@@ -25,7 +26,9 @@ class GymProblem(Problem):
         transitions = self.env.P[node.state.__str__()][action]
         action_cost = self.get_action_cost(action, node.state)
         for prob, next_state_key, reward, done in transitions:
-            info = [prob, reward]
+            info={}
+            info['prob'] = prob
+            info['reward'] = reward
             next_state = utils.State(next_state_key, done)
             successor_node = utils.Node (state=next_state, parent=node, action=action, path_cost= node.path_cost + action_cost, info=info)
             successor_nodes.append(successor_node)
@@ -40,6 +43,11 @@ class GymProblem(Problem):
             return True
         else:
             return False
+
+    def apply_action(self, action):
+        state, reward, done, info = self.env.step(int(action))
+        return [state, reward, done, info]
+
 
 
 

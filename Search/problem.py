@@ -22,11 +22,6 @@ class Problem (ABC):
     def evaluate(self, node):
         pass
 
-    # return whether val_a is better or equal to val_b in the domain
-    @abstractmethod
-    def is_better_or_equal(self, val_a, val_b):
-        pass
-
     # return the actions that are applicable in the current state
     @abstractmethod
     def get_applicable_actions(self, node):
@@ -47,9 +42,14 @@ class Problem (ABC):
     def is_goal_state(self, state):
         pass
 
+    @abstractmethod
+    def apply_action(self, action):
+        pass
+
     # get the current state
     def get_current_state(self):
         return self.current_state
+
 
     # value of a node
     def evaluate(self, node, use_cost_as_value=True):

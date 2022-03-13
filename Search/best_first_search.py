@@ -6,7 +6,7 @@ import logging, time
 
 # TODO: take care of logs
 # TODO: take care of transition function and the duplication of env for each node (and for the termination criteria)
-def best_first_search(problem, frontier, closed_list = None, termination_criteria = None, prune_func = None, log=False, log_file=None, iter_limit = defs.NA, time_limit = defs.NA, use_search_node_for_evaluation = False):
+def best_first_search(problem, frontier, closed_list = None, termination_criteria = None, evaluation_criteria = None, prune_func = None, log=False, log_file=None, iter_limit = defs.NA, time_limit = defs.NA, use_search_node_for_evaluation = False):
 
 
     """Search for the design sequence with the maximal value.
@@ -87,7 +87,7 @@ def best_first_search(problem, frontier, closed_list = None, termination_criteri
             start_time_evaluate = time.time()
             cur_value = problem.evaluate(cur_node)
 
-            if best_node is None or problem.is_better_or_equal(cur_value, best_value):
+            if best_node is None or evaluation_criteria.is_better_or_equal(cur_value, cur_node, best_value, best_node, problem):
                 best_value = cur_value
                 best_node = cur_node
 
@@ -100,10 +100,8 @@ def best_first_search(problem, frontier, closed_list = None, termination_criteri
                     print(log_string)
 
 
-
             # check if termination criteria had been met - and stop the search if it has
             if termination_criteria is not None and termination_criteria.isTerminal(best_node, best_value, problem):
-
                 logging.info(log_string)
                 break
 
@@ -149,7 +147,7 @@ def best_first_search(problem, frontier, closed_list = None, termination_criteri
 
         # return the best solution found
         print('solution is: %s'%(best_node.get_transition_path_string()))
-        return [best_value, best_node, explored_count,ex_terminated, results_log]
+        return [best_value, best_node, best_node.get_transition_path_string(), explored_count, ex_terminated, results_log]
 
     except Exception as e:
         if log_file is not None:
