@@ -10,6 +10,11 @@ def main():
     # define the environment
     taxi_env = gym.make("Taxi-v3").env
     taxi_env.reset()
+    state = taxi_env.encode(4, 4, 4, 1) # (taxi row, taxi column, passenger index, destination index)
+    taxi_row, taxi_col, pass_idx, dest_idx = taxi_env.decode(state)
+    print(taxi_row)
+    taxi_env.s = state
+    print("State:", state)
     taxi_env.render()
 
     # create a wrapper of the environment to the search

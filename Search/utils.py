@@ -8,6 +8,25 @@ import bisect
 
 from abc import ABC, abstractmethod
 
+class State:
+
+    """State superclass
+    """
+    def __init__(self, key, is_terminal=False):
+        self.key = key
+        self.is_terminal = is_terminal
+
+    def get_key(self):
+        return self.key
+
+    def __str__(self):
+        return self.key
+
+    def __repr__(self):
+        return self.key
+
+    def is_terminal(self):
+        return self.is_terminal
 
 class Node:
     """A node in a search tree. Contains a pointer to the parent (the node
@@ -32,7 +51,7 @@ class Node:
         return "<Node {}>".format(self.state.__str__())
 
     def __lt__(self, node):
-        return self.state < node.state
+        return self.state.get_key() < node.state.get_key()
 
     def expand(self, problem):
         """List the nodes reachable in one step from this node."""
@@ -73,7 +92,7 @@ class Node:
             action_name = 'None'
             if node.action:
                 action_name = node.action.__str__()
-            if action_name is not 'None':
+            if action_name != 'None':
                 path_back.append(action_name)
 
             node = node.parent

@@ -13,7 +13,7 @@ class Problem (ABC):
     def __init__(self, initial_state, constraints, stochastic=False):
 
         # creating the initial state object
-        self.current_state = State(initial_state, False)
+        self.current_state = utils.State(initial_state, False)
         self.constraints = constraints
         self.stochastic = stochastic
 
@@ -34,7 +34,7 @@ class Problem (ABC):
 
     # return the successors that will result from applying the action (without changing the state)
     @abstractmethod
-    def get_successors(self, action, state):
+    def get_successors(self, action, node):
         pass
 
     # return the action's cost
@@ -81,7 +81,7 @@ class Problem (ABC):
         return True
 
     # get all successors for cur_node
-    def successors(self, cur_node, cleanup=False):
+    def successors(self, cur_node):
 
         # get the actions that can be applied to this node
         action_list = self.get_applicable_actions(cur_node)
@@ -92,48 +92,19 @@ class Problem (ABC):
         successor_nodes = []
         for action in action_list:
 
-            action_cost = self.get_action_cost(action, cur_node.state)
-            successors = self.get_successors(action, cur_node.state)
-            for successor_state in successors:
-                prob = 1
-                successor_nodes = utils.Node(successor_state, cur_node, action, cur_node.path_cost+action_cost, cur_node.state,prob)
+            successor_nodes_cur_action = self.get_successors(action, cur_node)
+            for successor_node in successor_nodes_cur_action:
+                valid = True
+                # iterate through the constraints to see if the current action or successor states violate them
+                for constraint in self.constraints:
+                    if not constraint.is_valid(successor_node, action):
+                        valid = False
+                        break
 
-            valid = True
-            # iterate through the constraints to see if the current action or successor states violate them
-            for constraint in self.constraints:
-                if not constraint.is_valid(successor_node, action):
-                    valid = False
-                    break
-
-            # apply the action
-            if valid:
-                ''' add the successor node specifying:
-                    successor_state
-                    cur_node (ancestor)
-                    action (the applied action)
-                    node.path_cost+action.cost (the accumulated cost)
-                '''
-                successor_nodes.append(successor_node)
-
-        if cleanup:
-            cur_state.clean_up()
+                # add the node to the successor list
+                if valid:
+                    successor_nodes.append(successor_node)
 
         return successor_nodes
 
 
-class State:
-
-    """State superclass
-    """
-    def __init__(self, state_string, is_terminal=False):
-        self.state_string = state_string
-        self.is_terminal = is_terminal
-
-    def __str__(self):
-        return self.state_string
-
-    def __repr__(self):
-        return self.state_string
-
-    def is_terminal(self):
-        return self.is_terminal
