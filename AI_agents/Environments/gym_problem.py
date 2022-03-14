@@ -1,7 +1,7 @@
 __author__ = 'sarah'
 
-from Search.problem import Problem
-import Search.utils as utils
+from AI_agents.Search.problem import Problem
+import AI_agents.Search.utils as utils
 
 class GymProblem(Problem):
 
@@ -30,7 +30,7 @@ class GymProblem(Problem):
             info['prob'] = prob
             info['reward'] = reward
             next_state = utils.State(next_state_key, done)
-            successor_node = utils.Node (state=next_state, parent=node, action=action, path_cost= node.path_cost + action_cost, info=info)
+            successor_node = utils.Node (state=next_state, parent=node, action=action, path_cost=node.path_cost + action_cost, info=info)
             successor_nodes.append(successor_node)
 
         return successor_nodes

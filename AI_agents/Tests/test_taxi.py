@@ -1,8 +1,8 @@
 import gym
-from Environments.gym_problem import GymProblem
-from Search.best_first_search import best_first_search, breadth_first_search, depth_first_search
-import Search.utils as utils
-import Search.defs as defs
+from AI_agents.Environments.gym_problem import GymProblem
+from AI_agents.Search.best_first_search import best_first_search, breadth_first_search, depth_first_search
+import AI_agents.Search.utils as utils
+import AI_agents.Search.defs as defs
 
 
 def main_taxi_bfs():
@@ -69,11 +69,11 @@ def main_taxi_dfs_exp():
 
     # perform BFS
     [best_value, best_node, best_plan, explored_count, ex_terminated, results_log] = depth_first_search(problem=taxi_p,
-                                                                                                          log=True,
-                                                                                                          log_file=None,
-                                                                                                          iter_limit=defs.NA,
-                                                                                                          time_limit=defs.NA,
-                                                                                                          )
+                                                                                                        log=True,
+                                                                                                        log_file=None,
+                                                                                                        iter_limit=defs.NA,
+                                                                                                        time_limit=defs.NA,
+                                                                                                        )
 
 
     print(best_plan)
@@ -130,7 +130,7 @@ def main_test():
 
     # perform BFS
     optimal_path = best_first_search(problem=copy_p, frontier=utils.FIFOQueue(), closed_list=utils.ClosedListOfSequences(), termination_criteria=utils.TerminationCriteriaGoalStateReached(), prune_func=None, log=True,
-                          log_file=None, iter_limit=defs.NA, time_limit=defs.NA, use_search_node_for_evaluation=False)
+                                     log_file=None, iter_limit=defs.NA, time_limit=defs.NA, use_search_node_for_evaluation=False)
     print(optimal_path)
 
 

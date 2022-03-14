@@ -1,7 +1,7 @@
 __author__ = 'sarah'
 
 from abc import ABC, abstractmethod
-import Search.utils as utils
+import AI_agents.Search.utils as utils
 
 
 class Problem (ABC):

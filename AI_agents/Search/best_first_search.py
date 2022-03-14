@@ -1,7 +1,7 @@
 __author__ = 'sarah'
 
-import Search.utils as utils
-import Search.defs as defs
+import AI_agents.Search.utils as utils
+import AI_agents.Search.defs as defs
 import logging, time
 
 # TODO: take care of logs
@@ -166,7 +166,6 @@ def breadth_first_search(problem, log=False, log_file=None, iter_limit=defs.NA, 
                              iter_limit=iter_limit,
                              time_limit=time_limit)
 
-
 def depth_first_search(problem, log=False, log_file=None, iter_limit=defs.NA, time_limit=defs.NA):
     return best_first_search(problem,
                              frontier=utils.LIFOQueue(),
@@ -178,7 +177,6 @@ def depth_first_search(problem, log=False, log_file=None, iter_limit=defs.NA, ti
                              log_file=log_file,
                              iter_limit=iter_limit,
                              time_limit=time_limit)
-
 
 def log_progress(results_log, cur_node, cur_value, best_node, best_value, umd_problem, log_file, start_time, explored_count):
 
@@ -200,7 +198,7 @@ def log_progress(results_log, cur_node, cur_value, best_node, best_value, umd_pr
     else:
         results_log[cur_modification_cost] = [cur_value, cur_node, cur_time, 1]
 
-    log_message = 'cur_value::'+str(cur_value) +defs.SEPARATOR+ 'cur_node::'+cur_node.__repr__() +defs.SEPARATOR+ 'cur_time::' + '%.5f'%cur_time +defs.SEPARATOR+ 'cur_cost::'+'%.3f'%cur_modification_cost+defs.SEPARATOR+ 'best_node::'+best_node.__repr__() +defs.SEPARATOR+ 'best_value::'+str(best_value)+'\n'
+    log_message = 'cur_value::' + str(cur_value) + defs.SEPARATOR + 'cur_node::' + cur_node.__repr__() + defs.SEPARATOR + 'cur_time::' + '%.5f' % cur_time + defs.SEPARATOR + 'cur_cost::' + '%.3f' % cur_modification_cost + defs.SEPARATOR + 'best_node::' + best_node.__repr__() + defs.SEPARATOR + 'best_value::' + str(best_value) + '\n'
     print(log_message)
     log_file.write(log_message)
     log_file.flush()
