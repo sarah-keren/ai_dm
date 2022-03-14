@@ -129,7 +129,7 @@ def best_first_search (problem, frontier, closed_list = None, termination_criter
             for child in succs:
                 already_in_closed_list = False
                 if closed_list is not None:
-                    if closed_list.isInList(child):
+                    if closed_list.is_in_list(child):
                         already_in_closed_list = True
                 if not already_in_closed_list and child not in frontier:
                     frontier.add(child)
@@ -154,7 +154,6 @@ def best_first_search (problem, frontier, closed_list = None, termination_criter
             log_file.write('Exception occurred: %s'%str(e))
         raise e
 
-
 def breadth_first_search(problem, log=False, log_file=None, iter_limit=defs.NA, time_limit=defs.NA):
     return best_first_search(problem,
                              frontier=utils.FIFOQueue(),
@@ -166,6 +165,20 @@ def breadth_first_search(problem, log=False, log_file=None, iter_limit=defs.NA, 
                              log_file=log_file,
                              iter_limit=iter_limit,
                              time_limit=time_limit)
+
+
+def depth_first_search(problem, log=False, log_file=None, iter_limit=defs.NA, time_limit=defs.NA):
+    return best_first_search(problem,
+                             frontier=utils.LIFOQueue(),
+                             closed_list=utils.ClosedListOfSequences(),
+                             termination_criteria=utils.TerminationCriteriaGoalStateReached(),
+                             evaluation_criteria=utils.EvaluationCriteriaGoalCondition(),
+                             prune_func=None,
+                             log=log,
+                             log_file=log_file,
+                             iter_limit=iter_limit,
+                             time_limit=time_limit)
+
 
 def log_progress(results_log, cur_node, cur_value, best_node, best_value, umd_problem, log_file, start_time, explored_count):
 

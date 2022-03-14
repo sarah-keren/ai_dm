@@ -178,10 +178,10 @@ class Container(ABC):
 
 
 '''A First-In-First-Out Queue'''
-class FIFOQueue(Container):
+class Queue(Container):
 
-    def __init__(self, max_len=None):
-        super().__init__(queue.Queue(), max_len)
+    def __init__(self, queue, max_len=None):
+        super().__init__(queue, max_len)
 
     def add(self, item, check_existance=False):
 
@@ -209,8 +209,21 @@ class FIFOQueue(Container):
         for item in self.container:
             queue_string+= ' '
             queue_string+= item
-            
+
         return queue_string
+
+
+class FIFOQueue(Queue):
+
+    def __init__(self, max_len=None):
+        super().__init__(queue.Queue(), max_len)
+
+'''A First-In-First-Out Queue'''
+class LIFOQueue(Queue):
+
+    def __init__(self, max_len=None):
+        super().__init__(queue.LifoQueue(), max_len)
+
 
 class PriorityQueue(Container):
 
@@ -222,24 +235,24 @@ class PriorityQueue(Container):
     def __init__(self, order=min, f=lambda x: x):
         self.queue = []
         self.order = order
-        self.f = f   
-    
+        self.f = f
+
     #def add_(self, item):
     #    bisect.insort(self.A, (self.f(item), item))
-    
-    def add(self, node):        
+
+    def add(self, node):
         node.heuristic_value = self.f(node)
         bisect.insort(self.queue, (node.heuristic_value, node))
-        
+
     def __len__(self):
         return len(self.queue)
 
     def extract(self):
         #print('queue is ')
         #print(self.__repr__())
-  
+
         if self.order == min:
-            
+
             return self.queue.pop(0)[1]
         else:
             return self.queue.pop()[1]
@@ -256,15 +269,15 @@ class PriorityQueue(Container):
         for i, (value, item) in enumerate(self.queue):
             if item == key:
                 self.queue.pop(i)
-                
+
     def __repr__(self):
         queue_string = ''
-        for item  in self.queue:          
-        
+        for item  in self.queue:
+
             queue_string+= '( %d - %s)'%(item[0],item[1])
-            
+
         return queue_string
-            
+
 
 class ClosedList(ABC):
 
@@ -286,37 +299,30 @@ class ClosedListOfSequences(ClosedList):
 
     ''' Holding the list of items that have been explored '''
     def __init__(self):
-        self.closed_list = []
+        self.closed_list = set()
 
     def add(self, node):
-        self.closed_list.append(node.state)
+        self.closed_list.add(node.state)
 
-    def isInList(self, node):
-        
-        if node.state not in self.closed_list:
-            return False
-        else:
-            return True
+    def is_in_list(self, node):
+        return node.state in self.closed_list
 
 
 class ClosedListOfSets(ClosedList):
-    ''' Holding the list of items that have been explored 
+    ''' Holding the list of items that have been explored
     '''
     def __init__(self):
-        self.closed_list = []
+        self.closed_list = set()
 
     def add(self, node):
         sequence = node.transition_path()
-        sorted_sequence = sorted(sequence)
-        self.closed_list.append(sorted_sequence)
+        sorted_sequence = tuple(sorted(sequence))
+        self.closed_list.add(sorted_sequence)
 
-    def isInList(self, node):
+    def is_in_list(self, node):
         sequence = node.transition_path()
-        sorted_sequence = sorted(sequence)
-        if sorted_sequence not in self.closed_list:
-            return False
-        else:
-            return True       
+        sorted_sequence = tuple(sorted(sequence))
+        return sorted_sequence in self.closed_list
 
 
 class TerminationCriteria(ABC):
