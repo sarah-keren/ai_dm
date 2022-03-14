@@ -12,9 +12,9 @@ from shutil import rmtree
 from setuptools import find_packages, setup, Command
 
 # Package meta-data.
-NAME = 'AI-Agents-Lib'
+NAME = 'AI_agents'
 DESCRIPTION = 'Various AI agents'
-URL = 'https://github.com/sarah-keren/AI-agents'
+URL = 'https://github.com/sarah-keren/AI_agents'
 EMAIL = 'sarahk@technion.ac.il'
 AUTHOR = 'Sarah Keren'
 REQUIRES_PYTHON = '>=3.6.0'
