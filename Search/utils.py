@@ -278,13 +278,13 @@ class ClosedList(ABC):
         pass
 
     @abstractmethod
-    def isInList(self, node):
+    def is_in_list(self, node):
         pass
 
 
 class ClosedListOfSequences(ClosedList):
-    ''' Holding the list of items that have been explored 
-    '''
+
+    ''' Holding the list of items that have been explored '''
     def __init__(self):
         self.closed_list = []
 
@@ -324,7 +324,6 @@ class TerminationCriteria(ABC):
     @abstractmethod
     def isTerminal(self, node, value,problem):
         pass
-
 
 
 class TerminationCriteriaOptimalValue(TerminationCriteria):
