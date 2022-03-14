@@ -3,10 +3,11 @@ __author__ = 'sarah'
 
 # adapdted from aima-python-master: https://github.com/aimacode/aima-python
 
-import collections
+import collections, queue
 import bisect
 
 from abc import ABC, abstractmethod
+
 
 class State:
 
@@ -27,6 +28,7 @@ class State:
 
     def is_terminal(self):
         return self.is_terminal
+
 
 class Node:
     """A node in a search tree. Contains a pointer to the parent (the node
@@ -132,13 +134,7 @@ class Node:
         return hash(self.state)
 
 
-# ______________________________________________________________________________
-# Queues: Stack, FIFOQueue, PriorityQueue
-
-# TODO: queue.PriorityQueue
-# TODO: Priority queues may not belong here -- see treatment in utils.py
-
-class Queue:
+class Container(ABC):
 
     """Queue is an abstract class/interface. There are three types:
         Stack(): A Last In First Out Queue.
@@ -150,78 +146,73 @@ class Queue:
         q.pop()         -- return the top item from the queue
         len(q)          -- number of items in q (also q.__len())
         item in q       -- does q contain item?
-    Note that isinstance(Stack(), Queue) is false, because we implement stacks
-    as lists.  If Python ever gets interfaces, Queue will be an interface."""
+     """
+    def __init__(self, container, max_len=None):
 
-    def __init__(self):
-        raise NotImplementedError
+        self.container = container
+        self.max_len = max_len
 
-    def extend(self, items):
-        for item in items:
-            self.append(item)
 
-    def isEmpty(self):
-        if len(self) == 0:
-            return True
-        else:
-            return False
-    
-    def add(self, node):
-        raise NotImplementedError
-    
+    @abstractmethod
+    def add(self, item, check_existance=False):
+        pass
+
+    @abstractmethod
     def extract(self):
-        raise NotImplementedError
-    
+        pass
+
+    @abstractmethod
+    def __len__(self):
+        pass
+
+    @abstractmethod
+    def __contains__(self, item):
+        pass
+
+    @abstractmethod
     def __repr__(self, key):
-        raise NotImplementedError
-    
+        pass
 
-def Stack():
-    """Return an empty list, suitable as a Last-In-First-Out Queue."""
-    return []
+    def is_empty(self):
+        True if self.__len__() == 0 else False
 
 
-class FIFOQueue(Queue):
+'''A First-In-First-Out Queue'''
+class FIFOQueue(Container):
 
-    """A First-In-First-Out Queue."""
+    def __init__(self, max_len=None):
+        super().__init__(queue.Queue(), max_len)
 
-    def __init__(self, maxlen=None, items=[]):
-        self.queue = collections.deque(items, maxlen)
+    def add(self, item, check_existance=False):
 
-    def add(self, item):
-        if not self.queue.maxlen or len(self.queue) < self.queue.maxlen:
-            self.queue.append(item)
+        if check_existance and self.__contains__(item):
+            return
+
+        if not self.max_len or self.__len__() < self.max_len:
+            self.container.put(item)
         else:
             raise Exception('FIFOQueue is full')
 
-    def extend(self, items):
-        if not self.queue.maxlen or len(self.queue) + len(items) <= self.queue.maxlen:
-            self.queue.extend(items)
-        else:
-            raise Exception('FIFOQueue max length exceeded')
-
     def extract(self):
-        if len(self.queue) > 0:
-            return self.queue.popleft()
-        else:
-            raise Exception('FIFOQueue is empty')
+        return self.container.get()
+
 
     def __len__(self):
-        return len(self.queue)
+        return self.container.qsize
 
+    #todo: check if this works
     def __contains__(self, item):
-        return item in self.queue
-    
+        return item in self.container.queue
+
     def __repr__(self):
         queue_string = ''
-        for item  in self.queue:
+        for item in self.container:
             queue_string+= ' '
             queue_string+= item
             
         return queue_string
-    
 
-class PriorityQueue(Queue):
+class PriorityQueue(Container):
 
     """A queue in which the minimum (or maximum) element (as determined by f and
     order) is returned first. If order is min, the item with minimum f(x) is

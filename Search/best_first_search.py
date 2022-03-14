@@ -6,7 +6,7 @@ import logging, time
 
 # TODO: take care of logs
 # TODO: take care of transition function and the duplication of env for each node (and for the termination criteria)
-def best_first_search(problem, frontier, closed_list = None, termination_criteria = None, evaluation_criteria = None, prune_func = None, log=False, log_file=None, iter_limit = defs.NA, time_limit = defs.NA, use_search_node_for_evaluation = False):
+def best_first_search (problem, frontier, closed_list = None, termination_criteria = None, evaluation_criteria = None, prune_func = None, log=False, log_file=None, iter_limit = defs.NA, time_limit = defs.NA):
 
 
     """Search for the design sequence with the maximal value.
@@ -50,7 +50,7 @@ def best_first_search(problem, frontier, closed_list = None, termination_criteri
 
     try:
 
-        while not frontier.isEmpty() and continue_search:
+        while not frontier.is_empty() and continue_search:
 
             # count explored nodes
             explored_count += 1
@@ -154,6 +154,18 @@ def best_first_search(problem, frontier, closed_list = None, termination_criteri
             log_file.write('Exception occurred: %s'%str(e))
         raise e
 
+
+def breadth_first_search(problem, log=False, log_file=None, iter_limit=defs.NA, time_limit=defs.NA):
+    return best_first_search(problem,
+                             frontier=utils.FIFOQueue(),
+                             closed_list=utils.ClosedListOfSequences(),
+                             termination_criteria=utils.TerminationCriteriaGoalStateReached(),
+                             evaluation_criteria=utils.EvaluationCriteriaGoalCondition(),
+                             prune_func=None,
+                             log=log,
+                             log_file=log_file,
+                             iter_limit=iter_limit,
+                             time_limit=time_limit)
 
 def log_progress(results_log, cur_node, cur_value, best_node, best_value, umd_problem, log_file, start_time, explored_count):
 
