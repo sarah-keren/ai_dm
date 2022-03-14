@@ -54,10 +54,10 @@ class Problem (ABC):
     # value of a node
     def evaluate(self, node, use_cost_as_value=True):
         if use_cost_as_value:
-            return node.get_path_cost(self)
+            return node.get_path_cost(self)[0]
         # use value
         else:
-            return node.get_path_value(self)
+            return node.get_path_value(self)[0]
 
     # return whether val_a is better or equal to val_b in the domain
     def is_better_or_equal(self, val_a, val_b):

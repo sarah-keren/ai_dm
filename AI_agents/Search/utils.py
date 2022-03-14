@@ -196,7 +196,6 @@ class Queue(Container):
     def extract(self):
         return self.container.get()
 
-
     def __len__(self):
         return self.container.qsize
 
@@ -225,58 +224,23 @@ class LIFOQueue(Queue):
         super().__init__(queue.LifoQueue(), max_len)
 
 
-class PriorityQueue(Container):
+class PriorityQueue(Queue):
 
     """A queue in which the minimum (or maximum) element (as determined by f and
     order) is returned first. If order is min, the item with minimum f(x) is
     returned first; if order is max, then it is the item with maximum f(x).
     Also supports dict-like lookup."""
 
-    def __init__(self, order=min, f=lambda x: x):
-        self.queue = []
-        self.order = order
-        self.f = f
-
-    #def add_(self, item):
-    #    bisect.insort(self.A, (self.f(item), item))
+    def __init__(self, h=lambda x: x, max_len=None):
+        super().__init__(queue.PriorityQueue(), max_len)
+        self.h = h
 
     def add(self, node):
-        node.heuristic_value = self.f(node)
-        bisect.insort(self.queue, (node.heuristic_value, node))
-
-    def __len__(self):
-        return len(self.queue)
+        heuristic_value = self.h(node)
+        super().add((heuristic_value, node))
 
     def extract(self):
-        #print('queue is ')
-        #print(self.__repr__())
-
-        if self.order == min:
-
-            return self.queue.pop(0)[1]
-        else:
-            return self.queue.pop()[1]
-
-    def __contains__(self, item):
-        return any(item == pair[1] for pair in self.queue)
-
-    def __getitem__(self, key):
-        for _, item in self.queue:
-            if item == key:
-                return item
-
-    def __delitem__(self, key):
-        for i, (value, item) in enumerate(self.queue):
-            if item == key:
-                self.queue.pop(i)
-
-    def __repr__(self):
-        queue_string = ''
-        for item  in self.queue:
-
-            queue_string+= '( %d - %s)'%(item[0],item[1])
-
-        return queue_string
+        return self.container.get()[1]
 
 
 class ClosedList(ABC):
@@ -294,6 +258,17 @@ class ClosedList(ABC):
     def is_in_list(self, node):
         pass
 
+class ClosedListOfKeys(ClosedList):
+
+    ''' Holding the list of items that have been explored '''
+    def __init__(self):
+        self.closed_list = set()
+
+    def add(self, node):
+        self.closed_list.add(node.state.get_key())
+
+    def is_in_list(self, node):
+        return node.state.get_key() in self.closed_list
 
 class ClosedListOfSequences(ClosedList):
 
@@ -302,10 +277,10 @@ class ClosedListOfSequences(ClosedList):
         self.closed_list = set()
 
     def add(self, node):
-        self.closed_list.add(node.state)
+        self.closed_list.add(node.transition_path())
 
     def is_in_list(self, node):
-        return node.state in self.closed_list
+        return node.transition_path() in self.closed_list
 
 
 class ClosedListOfSets(ClosedList):

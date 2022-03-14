@@ -2,6 +2,7 @@ __author__ = 'sarah'
 
 import AI_agents.Search.utils as utils
 import AI_agents.Search.defs as defs
+import AI_agents.Search.heuristic as heuristic
 import logging, time
 
 # TODO: take care of logs
@@ -27,7 +28,8 @@ def best_first_search (problem, frontier, closed_list = None, termination_criter
     if log:
         logging.info('Starting: best_first_search')
         results_log = {}
-        start_time = time.time()
+
+    start_time = time.time()
 
     # init the search node
     root_node = utils.Node(problem.get_current_state(), None, None, 0)
@@ -91,7 +93,7 @@ def best_first_search (problem, frontier, closed_list = None, termination_criter
                 best_value = cur_value
                 best_node = cur_node
 
-            if log is not None:
+            if log:
                 log_string += ', node_eval_time:%.3f' % (time.time() - start_time_evaluate)
                 #log_string += ', cur_value:%.3f, best_node:%s, best_value:%.3f'%(cur_value, best_node, best_value)
                 if log_file:
@@ -102,23 +104,28 @@ def best_first_search (problem, frontier, closed_list = None, termination_criter
 
             # check if termination criteria had been met - and stop the search if it has
             if termination_criteria is not None and termination_criteria.isTerminal(best_node, best_value, problem):
-                logging.info(log_string)
+                if log:
+                    logging.info(log_string)
                 break
 
             # get the succsessors of the node
             succs = problem.successors(cur_node)
-            log_string += ', pre_prune_succ_count:%d' % (len(succs))
+            if log:
+                log_string += ', pre_prune_succ_count:%d' % (len(succs))
 
             # if pruning is applied - prune the set of successors
             start_time_prune = time.time()
             if prune_func is not None:
                 succs = prune_func(succs, cur_node)
-            log_string += ', prun_func_time:%.3f' %(time.time() - start_time_prune)
+            if log:
+                log_string += ', prun_func_time:%.3f' %(time.time() - start_time_prune)
 
             # sort succesors to make sure goal is reached at the same time for all approaches
             succs = sorted(succs, key=lambda x: x.get_transition_path_string(), reverse=False)
 
-            log_string += ', succ_count:%d' % (len(succs))
+            if log:
+                log_string += ', succ_count:%d' % (len(succs))
+
             # evaluate each child
             if succs is None:
                 continue
@@ -136,10 +143,10 @@ def best_first_search (problem, frontier, closed_list = None, termination_criter
                     if closed_list:
                         closed_list.add(child)
             succ_calc_time =  time.time() - start_time_succ
-            log_string += ', succ_calc_time:%.3f' % (succ_calc_time)
 
-
-            logging.info(log_string)
+            if log:
+                log_string += ', succ_calc_time:%.3f' % (succ_calc_time)
+                logging.info(log_string)
 
 
         calc_time = time.time() - start_time  # , "seconds"
@@ -147,7 +154,7 @@ def best_first_search (problem, frontier, closed_list = None, termination_criter
 
         # return the best solution found
         print('solution is: %s'%(best_node.get_transition_path_string()))
-        return [best_value, best_node, best_node.get_transition_path_string(), explored_count, ex_terminated, results_log]
+        return [best_value, best_node, best_node.get_transition_path_string(), explored_count, ex_terminated]
 
     except Exception as e:
         if log_file is not None:
@@ -157,7 +164,7 @@ def best_first_search (problem, frontier, closed_list = None, termination_criter
 def breadth_first_search(problem, log=False, log_file=None, iter_limit=defs.NA, time_limit=defs.NA):
     return best_first_search(problem,
                              frontier=utils.FIFOQueue(),
-                             closed_list=utils.ClosedListOfSequences(),
+                             closed_list=utils.ClosedListOfKeys(),
                              termination_criteria=utils.TerminationCriteriaGoalStateReached(),
                              evaluation_criteria=utils.EvaluationCriteriaGoalCondition(),
                              prune_func=None,
@@ -166,10 +173,24 @@ def breadth_first_search(problem, log=False, log_file=None, iter_limit=defs.NA, 
                              iter_limit=iter_limit,
                              time_limit=time_limit)
 
+
 def depth_first_search(problem, log=False, log_file=None, iter_limit=defs.NA, time_limit=defs.NA):
     return best_first_search(problem,
                              frontier=utils.LIFOQueue(),
-                             closed_list=utils.ClosedListOfSequences(),
+                             closed_list=utils.ClosedListOfKeys(),
+                             termination_criteria=utils.TerminationCriteriaGoalStateReached(),
+                             evaluation_criteria=utils.EvaluationCriteriaGoalCondition(),
+                             prune_func=None,
+                             log=log,
+                             log_file=log_file,
+                             iter_limit=iter_limit,
+                             time_limit=time_limit)
+
+
+def a_star(problem, heuristic_func=heuristic.zero_heuristic , log=False, log_file=None, iter_limit=defs.NA, time_limit=defs.NA):
+    return best_first_search(problem=problem,
+                             frontier=utils.PriorityQueue(heuristic_func),
+                             closed_list=utils.ClosedListOfKeys(),
                              termination_criteria=utils.TerminationCriteriaGoalStateReached(),
                              evaluation_criteria=utils.EvaluationCriteriaGoalCondition(),
                              prune_func=None,
