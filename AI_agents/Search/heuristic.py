@@ -25,7 +25,7 @@ def greedy_heuristic(node):
 
 
 def goal_heuristic(node):
-    if node.state.is_terminal() == True:
+    if node.state.is_terminal:
         return 0
     else:
         return 1
