@@ -23,6 +23,14 @@ def greedy_heuristic(node):
     else:
         return 1
 
+
+def goal_heuristic(node):
+    if node.state.is_terminal() == True:
+        return 0
+    else:
+        return 1
+
+
 class db_heuristic():
 
     def __init__(self, problem, key_indices=[0], split='true'):
