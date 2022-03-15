@@ -17,6 +17,7 @@ def get_heuristic(heuristic_name, problem):
 def zero_heuristic(node):
     return 0
 
+
 def greedy_heuristic(node):
     if node.parent is None:
         return 0
