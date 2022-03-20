@@ -110,7 +110,7 @@ def main_taxi_dfsl():
     taxi_p = GymProblem(taxi_env, taxi_env.unwrapped.s)
 
 
-    # perform BFS
+    # perform dfs-l
     [best_value, best_node, best_plan, explored_count, ex_terminated] = depth_first_search_l(problem=taxi_p, max_depth=3,
                                                                                                         log=True,
                                                                                                         log_file=None,
