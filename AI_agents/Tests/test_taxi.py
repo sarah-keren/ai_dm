@@ -125,6 +125,7 @@ def main_taxi_dfsl():
         taxi_p.env.render()
 
 
+
 def main_taxi_bfs_exp():
 
     # define the environment
