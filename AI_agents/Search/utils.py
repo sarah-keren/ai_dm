@@ -174,7 +174,11 @@ class Container(ABC):
         pass
 
     def is_empty(self):
-        True if self.__len__() == 0 else False
+        len = self.__len__()
+        if len == 0:
+            return True
+        else:
+            return False
 
 
 '''A First-In-First-Out Queue'''
@@ -197,7 +201,7 @@ class Queue(Container):
         return self.container.get()
 
     def __len__(self):
-        return self.container.qsize
+        return self.container.qsize()
 
     #todo: check if this works
     def __contains__(self, item):
@@ -358,3 +362,18 @@ class EvaluationCriteriaGoalCondition(EvaluationCriteria):
 
     def __str__(self):
         raise NotImplementedError
+
+
+
+
+
+
+def apply_constraints(constraints, unfiltered_list):
+    filtered_group = []
+    for element in unfiltered_list:
+        # iterate through the constraints to see if the current action or successor states violate them
+        for constraint in constraints:
+            if constraint.is_valid(element):
+                filtered_group.append(element)
+
+    return filtered_group

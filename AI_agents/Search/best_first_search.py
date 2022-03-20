@@ -3,11 +3,12 @@ __author__ = 'sarah'
 import AI_agents.Search.utils as utils
 import AI_agents.Search.defs as defs
 import AI_agents.Search.heuristic as heuristic
+import AI_agents.Search.constraint as constraint
 import logging, time
 
 # TODO: take care of logs
 # TODO: take care of transition function and the duplication of env for each node (and for the termination criteria)
-def best_first_search (problem, frontier, closed_list = None, termination_criteria = None, evaluation_criteria = None, prune_func = None, log=False, log_file=None, iter_limit = defs.NA, time_limit = defs.NA):
+def best_first_search (problem, frontier, closed_list = None, termination_criteria = None, evaluation_criteria = None, prune_func = None, constraints = None, log=False, log_file=None, iter_limit = defs.NA, time_limit = defs.NA):
 
 
     """Search for the design sequence with the maximal value.
@@ -110,6 +111,8 @@ def best_first_search (problem, frontier, closed_list = None, termination_criter
 
             # get the succsessors of the node
             succs = problem.successors(cur_node)
+            if constraints:
+                succs = utils.apply_constraints(constraints, succs)
             if log:
                 log_string += ', pre_prune_succ_count:%d' % (len(succs))
 
@@ -127,7 +130,7 @@ def best_first_search (problem, frontier, closed_list = None, termination_criter
                 log_string += ', succ_count:%d' % (len(succs))
 
             # evaluate each child
-            if succs is None:
+            if succs is None or len(succs) == 0:
                 continue
 
             # add children to the frontier
@@ -168,6 +171,7 @@ def breadth_first_search(problem, log=False, log_file=None, iter_limit=defs.NA, 
                              termination_criteria=utils.TerminationCriteriaGoalStateReached(),
                              evaluation_criteria=utils.EvaluationCriteriaGoalCondition(),
                              prune_func=None,
+                             constraints = None,
                              log=log,
                              log_file=log_file,
                              iter_limit=iter_limit,
@@ -181,6 +185,21 @@ def depth_first_search(problem, log=False, log_file=None, iter_limit=defs.NA, ti
                              termination_criteria=utils.TerminationCriteriaGoalStateReached(),
                              evaluation_criteria=utils.EvaluationCriteriaGoalCondition(),
                              prune_func=None,
+                             constraints=None,
+                             log=log,
+                             log_file=log_file,
+                             iter_limit=iter_limit,
+                             time_limit=time_limit)
+
+
+def depth_first_search_l(problem, max_depth, log=False, log_file=None, iter_limit=defs.NA, time_limit=defs.NA):
+    return best_first_search(problem,
+                             frontier=utils.LIFOQueue(),
+                             closed_list=utils.ClosedListOfKeys(),
+                             termination_criteria=utils.TerminationCriteriaGoalStateReached(),
+                             evaluation_criteria=utils.EvaluationCriteriaGoalCondition(),
+                             prune_func=None,
+                             constraints=[constraint.DepthConstraint(max_depth)],
                              log=log,
                              log_file=log_file,
                              iter_limit=iter_limit,
@@ -194,6 +213,7 @@ def a_star(problem, heuristic_func=heuristic.zero_heuristic , log=False, log_fil
                              termination_criteria=utils.TerminationCriteriaGoalStateReached(),
                              evaluation_criteria=utils.EvaluationCriteriaGoalCondition(),
                              prune_func=None,
+                             constraints=None,
                              log=log,
                              log_file=log_file,
                              iter_limit=iter_limit,
