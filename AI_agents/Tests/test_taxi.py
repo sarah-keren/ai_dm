@@ -1,5 +1,5 @@
 import gym
-from AI_agents.Environments.gym_problem import GymProblem
+from AI_agents.Environments.gym_envs.gym_problem import GymProblem
 from AI_agents.Search.best_first_search import best_first_search, breadth_first_search, depth_first_search, a_star, depth_first_search_l
 import AI_agents.Search.utils as utils
 import AI_agents.Search.defs as defs

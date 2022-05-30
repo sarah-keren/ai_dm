@@ -17,10 +17,7 @@ class Problem (ABC):
         self.constraints = constraints
         self.stochastic = stochastic
 
-    # returns the value of a node
-    @abstractmethod
-    def evaluate(self, node):
-        pass
+
 
     # return the actions that are applicable in the current state
     @abstractmethod
