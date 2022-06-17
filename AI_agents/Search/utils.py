@@ -92,7 +92,7 @@ class Node:
         node, path_back = self, []
         while node:
             action_name = 'None'
-            if node.action:
+            if node.action is not None:
                 action_name = node.action.__str__()
             if action_name != 'None':
                 path_back.append(action_name)

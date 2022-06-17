@@ -156,7 +156,8 @@ def best_first_search (problem, frontier, closed_list = None, termination_criter
         #logging.info('Ending: best_first_design: {best_value:%d, best_node:%s, explored_count:%d, ex_terminated:%s, calc_time:%.3f}'%(best_value,best_node, explored_count,ex_terminated, calc_time))
 
         # return the best solution found
-        print('solution is: %s'%(best_node.get_transition_path_string()))
+        if log:
+            print('solution is: %s'%(best_node.get_transition_path_string()))
         return [best_value, best_node, best_node.get_transition_path_string(), explored_count, ex_terminated]
 
     except Exception as e:
