@@ -235,13 +235,13 @@ class PriorityQueue(Queue):
     returned first; if order is max, then it is the item with maximum f(x).
     Also supports dict-like lookup."""
 
-    def __init__(self, h=lambda x: x, max_len=None):
+    def __init__(self, eval_func=lambda x: x, max_len=None):
         super().__init__(queue.PriorityQueue(), max_len)
-        self.h = h
+        self.eval_func = eval_func
 
     def add(self, node):
-        heuristic_value = self.h(node)
-        super().add((heuristic_value, node))
+        eval_value = self.eval_func(node)
+        super().add((eval_value, node))
 
     def extract(self):
         return self.container.get()[1]

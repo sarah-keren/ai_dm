@@ -206,6 +206,20 @@ def depth_first_search_l(problem, max_depth, log=False, log_file=None, iter_limi
                              iter_limit=iter_limit,
                              time_limit=time_limit)
 
+def a_star(problem, heuristic_func=heuristic.zero_heuristic , log=False, log_file=None, iter_limit=defs.NA, time_limit=defs.NA):
+    f_func = lambda x: x.get_path_cost(problem)[0]+heuristic_func(x)
+    return best_first_search(problem=problem,
+                             frontier=utils.PriorityQueue(f_func),
+                             closed_list=utils.ClosedListOfKeys(),
+                             termination_criteria=utils.TerminationCriteriaGoalStateReached(),
+                             evaluation_criteria=utils.EvaluationCriteriaGoalCondition(),
+                             prune_func=None,
+                             constraints=None,
+                             log=log,
+                             log_file=log_file,
+                             iter_limit=iter_limit,
+                             time_limit=time_limit)
+
 
 def greedy_best_first_search(problem, heuristic_func=heuristic.zero_heuristic , log=False, log_file=None, iter_limit=defs.NA, time_limit=defs.NA):
     return best_first_search(problem=problem,

@@ -1,6 +1,6 @@
 import gym
 from AI_agents.Environments.gym_envs.gym_problem import GymProblem
-from AI_agents.Search.best_first_search import best_first_search, breadth_first_search, depth_first_search, a_star, depth_first_search_l
+from AI_agents.Search.best_first_search import best_first_search, breadth_first_search, depth_first_search, greedy_best_first_search, a_star, depth_first_search_l
 import AI_agents.Search.utils as utils
 import AI_agents.Search.defs as defs
 import AI_agents.Search.heuristic as heuristic
@@ -163,7 +163,7 @@ def main_taxi_bfs_exp():
         taxi_p.env.render()
 
 
-def main_taxi_A_star_exp():
+def main_taxi_a_star():
 
     # define the environment
     taxi_env = gym.make("Taxi-v3").env
@@ -201,7 +201,7 @@ def main_taxi_A_star_exp():
         taxi_p.apply_action(action_id)
         taxi_p.env.render()
 
-def main_taxi_A_star():
+def main_taxi_a_star():
 
     # define the environment
     taxi_env = gym.make("Taxi-v3").env
@@ -224,7 +224,7 @@ def main_taxi_A_star():
     taxi_p = GymProblem(taxi_env, taxi_env.unwrapped.s)
 
     # perform A*
-    [best_value, best_node, best_plan, explored_count, ex_terminated] = a_star(problem=taxi_p, heuristic_func=heuristic.zero_heuristic, log=True)
+    [best_value, best_node, best_plan, explored_count, ex_terminated] = a_star(problem=taxi_p,heuristic_func=heuristic.zero_heuristic, log=True)
 
     print(best_plan)
     for action_id in best_plan:
@@ -260,5 +260,5 @@ if __name__ == "__main__":
 
     #main_taxi_bfs()
     #main_taxi_dfs()
-    #main_taxi_A_star()
-    main_taxi_dfsl()
+    main_taxi_a_star()
+    #main_taxi_dfsl()
