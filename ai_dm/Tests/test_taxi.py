@@ -1,9 +1,9 @@
 import gym
-from AI_agents.Environments.gym_envs.gym_problem import GymProblem
-from AI_agents.Search.best_first_search import best_first_search, breadth_first_search, depth_first_search, greedy_best_first_search, a_star, depth_first_search_l
-import AI_agents.Search.utils as utils
-import AI_agents.Search.defs as defs
-import AI_agents.Search.heuristic as heuristic
+from ai_dm.Environments.gym_envs.gym_problem import GymProblem
+from ai_dm.Search.best_first_search import best_first_search, breadth_first_search, depth_first_search, greedy_best_first_search, a_star, depth_first_search_l
+import ai_dm.Search.utils as utils
+import ai_dm.Search.defs as defs
+import ai_dm.Search.heuristic as heuristic
 
 
 

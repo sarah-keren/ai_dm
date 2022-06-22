@@ -28,7 +28,7 @@ predict: given state(s), use model to predict what the action should be
 class BehavioralCloningAgent(object):
     def __init__(self, env, get_expert_action, obs_per_iteration,
             convert_expert_to_model = lambda x: x, # these functions should be observation to observation
-            convert_model_to_expert = lambda x: x, 
+            convert_model_to_expert = lambda x: x,
             model = GradientBoostingClassifier(n_estimators=300, learning_rate=.01, random_state=0),
             iterations = 1,
             max_episode_length = 50):
@@ -120,8 +120,8 @@ class BehavioralCloningAgent(object):
 # There are 6 discrete deterministic actions:
 # - 0: move south
 # - 1: move north
-# - 2: move east 
-# - 3: move west 
+# - 2: move east
+# - 3: move west
 # - 4: pickup passenger
 # - 5: dropoff passenger
 
@@ -138,7 +138,7 @@ class Taxi_Expert:
         for loc in self.locs:
             self.shortest_path_trees.append(self.shortest_path_tree(loc))
 
-    # produce a shortest path tree for the shortest ways to get to the location specified    
+    # produce a shortest path tree for the shortest ways to get to the location specified
     def shortest_path_tree(self, loc):
         spt = np.empty((self.num_rows,self.num_cols))
         spt[:] = np.nan
@@ -147,7 +147,7 @@ class Taxi_Expert:
         q.put(loc)
         while not q.empty(): # until no entries in the array are still nan
             (row, col) = q.get() # current location we are exploring the neighbors of
-            for action in range(4): 
+            for action in range(4):
                 if action == 0:
                     new_loc = (min(row + 1, self.max_row), col)
                     if np.isnan(spt[new_loc]):
@@ -244,8 +244,8 @@ class Taxi_Processor:
 def test_taxi():
 
     import gym
-    from AI_agents.Environments.gym_envs.taxi_utils import Taxi_Expert
-    from AI_agents.Environments.gym_envs.taxi_utils import Taxi_Processor
+    from ai_dm.Environments.gym_envs.taxi_utils import Taxi_Expert
+    from ai_dm.Environments.gym_envs.taxi_utils import Taxi_Processor
 
     env = gym.make("Taxi-v3").env
     env.reset()
@@ -257,4 +257,3 @@ def test_taxi():
 
 if __name__ == "__main__":
     test_taxi()
-        

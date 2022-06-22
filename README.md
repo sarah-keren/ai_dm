@@ -1,4 +1,4 @@
-# RL-agents
+# AI Decision Makers
 
 TODO !
 

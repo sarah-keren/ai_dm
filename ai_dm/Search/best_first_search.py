@@ -1,9 +1,9 @@
 __author__ = 'sarah'
 
-import AI_agents.Search.utils as utils
-import AI_agents.Search.defs as defs
-import AI_agents.Search.heuristic as heuristic
-import AI_agents.Search.constraint as constraint
+import ai_dm.Search.utils as utils
+import ai_dm.Search.defs as defs
+import ai_dm.Search.heuristic as heuristic
+import ai_dm.Search.constraint as constraint
 import logging, time
 
 # TODO: take care of logs
@@ -21,7 +21,7 @@ def best_first_search (problem, frontier, closed_list = None, termination_criter
 
        - frontier (fringe) - keeps the open nodes and defines the order by which they are examined (e.g., queue) see Search.utils for options
                     if this is a heuristic search, the heuristic is used by the frontier when add is evoked
-       - closed_list - maintains the states that have been explored (if set to None, no list is maintained) 
+       - closed_list - maintains the states that have been explored (if set to None, no list is maintained)
        - termination_criteria - a termination condition for which the current best result is returned.
          For example, for a goal directed search the search will stop once the goal condition is satisfied
        - prune_func - given the successors of a node, the pruning function returns only the nodes to be further explored
@@ -259,7 +259,7 @@ def log_progress(results_log, cur_node, cur_value, best_node, best_value, umd_pr
     log_file.write(log_message)
     log_file.flush()
 
-    
+
 
 
 
