@@ -45,8 +45,7 @@ class GymProblem(Problem):
             return False
 
     def apply_action(self, action):
-        state, reward, done, info = self.env.step(int(action))
-        return [state, reward, done, info]
+        return self.env.step(int(action))
 
 
 
