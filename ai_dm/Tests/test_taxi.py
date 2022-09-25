@@ -10,7 +10,7 @@ import ai_dm.Search.heuristic as heuristic
 def main_taxi_bfs():
 
     # define the environment
-    taxi_env = gym.make("Taxi-v3").env
+    taxi_env = gym.make("Taxi-v3", render_mode='ansi').env
     taxi_env.reset()
     #init_state = taxi_env.encode(0, 4, 4, 1) # (taxi row, taxi column, passenger index, destination index)
     init_state = taxi_env.encode(0, 3, 4, 1)  # (taxi row, taxi column, passenger index, destination index)
@@ -18,7 +18,7 @@ def main_taxi_bfs():
     print(taxi_row)
     taxi_env.unwrapped.s = init_state
     print("State:", init_state)
-    taxi_env.render()
+    print(taxi_env.render())
 
     # dropping off the passenger
     #observation, reward, done, info = taxi_env.step(5)
@@ -52,14 +52,14 @@ def main_taxi_dfs():
 
 
     # define the environment
-    taxi_env = gym.make("Taxi-v3").env
+    taxi_env = gym.make("Taxi-v3", render_mode='ansi').env
     taxi_env.reset()
     #init_state = taxi_env.encode(0, 4, 4, 1) # (taxi row, taxi column, passenger index, destination index)
     init_state = taxi_env.encode(0, 3, 4, 1)   # (taxi row, taxi column, passenger index, destination index)
     taxi_row, taxi_col, pass_idx, dest_idx = taxi_env.decode(init_state)
     taxi_env.unwrapped.s = init_state
     print("State:", init_state)
-    taxi_env.render()
+    print(taxi_env.render())
 
     # dropping off the passenger
     #observation, reward, done, info = taxi_env.step(5)
@@ -91,14 +91,14 @@ def main_taxi_dfsl():
 
 
     # define the environment
-    taxi_env = gym.make("Taxi-v3").env
+    taxi_env = gym.make("Taxi-v3", render_mode='ansi').env
     taxi_env.reset()
     #init_state = taxi_env.encode(0, 4, 4, 1) # (taxi row, taxi column, passenger index, destination index)
     init_state = taxi_env.encode(0, 3, 4, 1)   # (taxi row, taxi column, passenger index, destination index)
     taxi_row, taxi_col, pass_idx, dest_idx = taxi_env.decode(init_state)
     taxi_env.unwrapped.s = init_state
     print("State:", init_state)
-    taxi_env.render()
+    print(taxi_env.render())
 
     # dropping off the passenger
     #observation, reward, done, info = taxi_env.step(5)
@@ -129,14 +129,14 @@ def main_taxi_dfsl():
 def main_taxi_bfs_exp():
 
     # define the environment
-    taxi_env = gym.make("Taxi-v3").env
+    taxi_env = gym.make("Taxi-v3", render_mode='ansi').env
     taxi_env.reset()
     #init_state = taxi_env.encode(0, 4, 4, 1) # (taxi row, taxi column, passenger index, destination index)
     init_state = taxi_env.encode(0, 3, 4, 1)  # (taxi row, taxi column, passenger index, destination index)
     taxi_row, taxi_col, pass_idx, dest_idx = taxi_env.decode(init_state)
     taxi_env.unwrapped.s = init_state
     print("State:", init_state)
-    taxi_env.render()
+    print(taxi_env.render())
 
     # dropping off the passenger
     #observation, reward, done, info = taxi_env.step(5)
@@ -166,7 +166,7 @@ def main_taxi_bfs_exp():
 def main_taxi_a_star():
 
     # define the environment
-    taxi_env = gym.make("Taxi-v3").env
+    taxi_env = gym.make("Taxi-v3", render_mode='ansi').env
     taxi_env.reset()
     #init_state = taxi_env.encode(0, 4, 4, 1) # (taxi row, taxi column, passenger index, destination index)
     init_state = taxi_env.encode(0, 3, 4, 1)  # (taxi row, taxi column, passenger index, destination index)
@@ -174,7 +174,7 @@ def main_taxi_a_star():
     print(taxi_row)
     taxi_env.unwrapped.s = init_state
     print("State:", init_state)
-    taxi_env.render()
+    print(taxi_env.render())
 
     # dropping off the passenger
     #observation, reward, done, info = taxi_env.step(5)
@@ -204,7 +204,7 @@ def main_taxi_a_star():
 def main_taxi_a_star():
 
     # define the environment
-    taxi_env = gym.make("Taxi-v3").env
+    taxi_env = gym.make("Taxi-v3", render_mode='ansi').env
     taxi_env.reset()
     #init_state = taxi_env.encode(0, 4, 4, 1) # (taxi row, taxi column, passenger index, destination index)
     init_state = taxi_env.encode(0, 3, 4, 1)  # (taxi row, taxi column, passenger index, destination index)
@@ -212,7 +212,7 @@ def main_taxi_a_star():
     print(taxi_row)
     taxi_env.unwrapped.s = init_state
     print("State:", init_state)
-    taxi_env.render()
+    print(taxi_env.render())
 
     # dropping off the passenger
     #observation, reward, done, info = taxi_env.step(5)
