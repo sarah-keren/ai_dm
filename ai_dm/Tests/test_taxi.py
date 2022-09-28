@@ -1,6 +1,8 @@
 import gym
 from ai_dm.Environments.gym_envs.gym_problem import GymProblem
 from ai_dm.Search.best_first_search import best_first_search, breadth_first_search, depth_first_search, greedy_best_first_search, a_star, depth_first_search_l
+from ai_dm.Search.mcts import mcts
+
 import ai_dm.Search.utils as utils
 import ai_dm.Search.defs as defs
 import ai_dm.Search.heuristic as heuristic
@@ -250,6 +252,34 @@ def main_test():
 
 
 
+def main_taxi_mcts():
+
+    # define the environment
+    taxi_env = gym.make("Taxi-v3", render_mode='ansi').env
+    taxi_env.reset()
+    #init_state = taxi_env.encode(0, 4, 4, 1) # (taxi row, taxi column, passenger index, destination index)
+    init_state = taxi_env.encode(0, 3, 4, 1)  # (taxi row, taxi column, passenger index, destination index)
+    taxi_row, taxi_col, pass_idx, dest_idx = taxi_env.decode(init_state)
+    print(taxi_row)
+    taxi_env.unwrapped.s = init_state
+    print("State:", init_state)
+    print(taxi_env.render())
+
+
+    # create a wrapper of the environment to the search
+    taxi_p = GymProblem(taxi_env, taxi_env.unwrapped.s)
+
+
+    ## perform MCTS
+    #[best_value, best_node, best_plan, explored_count, ex_terminated] = a_star(problem=taxi_p,heuristic_func=heuristic.zero_heuristic, log=True)
+    #[best_value, best_node, best_plan, explored_count, ex_terminated] = \
+    mcts(problem=taxi_p)
+
+    #print(best_plan)
+    #for action_id in best_plan:
+    #    taxi_p.apply_action(action_id)
+    #    taxi_p.env.render()
+
 
 
 if __name__ == "__main__":
@@ -260,5 +290,7 @@ if __name__ == "__main__":
 
     #main_taxi_bfs()
     #main_taxi_dfs()
-    main_taxi_a_star()
+    #main_taxi_a_star()
     #main_taxi_dfsl()
+
+    main_taxi_mcts()
