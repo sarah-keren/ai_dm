@@ -21,7 +21,13 @@ class Problem (ABC):
 
     # return the actions that are applicable in the current state
     @abstractmethod
-    def get_applicable_actions(self, node):
+    def get_applicable_actions_at_state(self, state):
+        pass
+
+
+    # return the actions that are applicable in the current state
+    @abstractmethod
+    def get_applicable_actions_at_node(self, node):
         pass
 
     # return the successors that will result from applying the action (without changing the state)

@@ -14,8 +14,13 @@ class GymProblem(Problem):
         self.counter = 0
 
     # get the actions that can be applied at the current node
-    def get_applicable_actions(self, node):
+    def get_applicable_actions_at_node(self, node):
         action_list = self.env.P[node.state.get_key()].keys()
+        return action_list
+
+    # get the actions that can be applied at the current node
+    def get_applicable_actions_at_state(self, state):
+        action_list = self.env.P[state.get_key()].keys()
         return action_list
 
     # get (all) succesor states of an action and their

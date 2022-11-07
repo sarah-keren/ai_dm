@@ -1,11 +1,12 @@
 import gym
 from ai_dm.Environments.gym_envs.gym_problem import GymProblem
 from ai_dm.Search.best_first_search import best_first_search, breadth_first_search, depth_first_search, greedy_best_first_search, a_star, depth_first_search_l
-from ai_dm.Search.mcts import mcts
-
+import ai_dm.Search.mcts as mcts
 import ai_dm.Search.utils as utils
 import ai_dm.Search.defs as defs
 import ai_dm.Search.heuristic as heuristic
+
+import ai_dm.base.comp_resources as comp_resources
 
 
 
@@ -271,9 +272,7 @@ def main_taxi_mcts():
 
 
     ## perform MCTS
-    #[best_value, best_node, best_plan, explored_count, ex_terminated] = a_star(problem=taxi_p,heuristic_func=heuristic.zero_heuristic, log=True)
-    #[best_value, best_node, best_plan, explored_count, ex_terminated] = \
-    mcts(problem=taxi_p)
+    [best_value, best_node, best_plan, explored_count, ex_terminated] = mcts.mcts(problem=taxi_p, comp_resources=comp_resources.ComputationalResources(50) , selection_policy= mcts.uct_selection_policy, expansion_policy= mcts.default_expansion_policy, rollout_policy=mcts.default_rollout_policy)
 
     #print(best_plan)
     #for action_id in best_plan:
