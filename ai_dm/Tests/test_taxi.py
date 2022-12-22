@@ -287,9 +287,9 @@ if __name__ == "__main__":
     #main_taxi_dfs_exp()
 
 
-    #main_taxi_bfs()
+    main_taxi_bfs()
     #main_taxi_dfs()
     #main_taxi_a_star()
     #main_taxi_dfsl()
 
-    main_taxi_mcts()
+    #main_taxi_mcts()

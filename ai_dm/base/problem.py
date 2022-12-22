@@ -87,7 +87,7 @@ class Problem (ABC):
     def successors(self, cur_node):
 
         # get the actions that can be applied to this node
-        action_list = self.get_applicable_actions(cur_node)
+        action_list = self.get_applicable_actions_at_node(cur_node)
         if action_list is None:
             return None
 
