@@ -10,6 +10,8 @@ def test_taxi_q_learning():
     # define the environment
     taxi_env = gym.make("Taxi-v3", render_mode='ansi').env
     taxi_env.reset()
+
+    # set the initial state
     init_state = taxi_env.encode(0, 3, 4, 1)  # (taxi row, taxi column, passenger index, destination index)
     taxi_row, taxi_col, pass_idx, dest_idx = taxi_env.decode(init_state)
     print(taxi_row)
@@ -17,15 +19,10 @@ def test_taxi_q_learning():
     print("State:", init_state)
     print(taxi_env.render())
 
-
-    # create a wrapper of the environment to the search
+    # create a wrapper of the environment
     taxi_p = GymProblem(taxi_env, taxi_env.unwrapped.s)
 
     # perform q_learning
-
-
-
-
     #[best_value, best_node, best_plan, explored_count, ex_terminated] = \
     q_learning(problem=taxi_p,learning_rate=0.9, discount_rate=0.8, epsilon=1.0, decay_rate=0.005, num_episodes=1000,
                    max_steps_per_episode=99,  num_of_trials=100, log=False, log_file=None)

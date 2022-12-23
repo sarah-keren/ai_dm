@@ -32,22 +32,19 @@ def train(problem, learning_rate=0.9, discount_rate=0.8, epsilon=1.0, decay_rate
                 action = np.argmax(qtable[state,:])
 
             # take action and observe reward
-            [new_obs, reward, terminated, truncated, info] = problem.env.step(action)
+            [new_state, reward, terminated, truncated, info] = problem.env.step(action)
 
             # Q-learning update
-            qtable[state,action] = qtable[state,action] + learning_rate * (reward + discount_rate * np.max(qtable[new_obs,:]) - qtable[state,action])
-
-
+            qtable[state,action] = qtable[state,action] + learning_rate * (reward + discount_rate * np.max(qtable[new_state,:]) - qtable[state,action])
 
             # Update to our new state
-
-            state = new_obs
+            state = new_state
 
             # if done, finish episode
             if terminated:
                 break
 
-        # Decrease epsilon
+        # decrease epsilon
         epsilon = np.exp(-decay_rate*episode)
 
     print(f"Training completed over {num_episodes} episodes")
