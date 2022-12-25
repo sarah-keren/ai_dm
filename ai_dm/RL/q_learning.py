@@ -45,7 +45,7 @@ def train(problem, learning_rate=0.9, discount_rate=0.8, epsilon=1.0, decay_rate
                 break
 
         # decrease epsilon
-        epsilon = np.exp(-decay_rate*episode)
+        epsilon *= np.exp(-decay_rate)
 
     print(f"Training completed over {num_episodes} episodes")
     return qtable

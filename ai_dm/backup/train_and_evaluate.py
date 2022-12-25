@@ -88,8 +88,7 @@ def run_episode_multi_agent(env, agents, max_episode_len, method, display):
             break
 
     return total_rewards, agent_rewards, train_steps
-
-
+`
 def train(env, is_env_multiagent, agents, max_episode_len, num_episodes, display, save_rate, agents_save_path, train_result_path):
     method = 'train'
     run(env, is_env_multiagent, agents, max_episode_len, num_episodes, method, display, save_rate, agents_save_path,
