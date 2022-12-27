@@ -20,6 +20,8 @@ def train(problem, learning_rate=0.9, discount_rate=0.8, epsilon=1.0, decay_rate
     for episode in range(num_episodes):
 
         # reset the environment
+        print("state: ")
+        print(problem.env.reset())
         state = problem.env.reset()[0]
         for s in range(max_steps_per_episode):
 
