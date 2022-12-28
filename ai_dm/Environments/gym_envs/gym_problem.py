@@ -52,7 +52,9 @@ class GymProblem(Problem):
     def apply_action(self, action):
         return self.env.step(int(action))
 
-
+    # reset environment and return initial state
+    def reset_env(self):
+        return self.env.reset()[0]
 
 
 

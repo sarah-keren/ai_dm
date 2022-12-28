@@ -20,9 +20,7 @@ def train(problem, learning_rate=0.9, discount_rate=0.8, epsilon=1.0, decay_rate
     for episode in range(num_episodes):
 
         # reset the environment
-        print("state: ")
-        print(problem.env.reset())
-        state = problem.env.reset()[0]
+        state = problem.reset_env()
         for s in range(max_steps_per_episode):
 
             # exploration-exploitation tradeoff
@@ -52,15 +50,15 @@ def train(problem, learning_rate=0.9, discount_rate=0.8, epsilon=1.0, decay_rate
     print(f"Training completed over {num_episodes} episodes")
     return qtable
 
-def evaluate(problem, qtable, max_steps_per_episode, num_of_trials, render= True, log=False, log_file=None):
+def evaluate(problem, qtable, max_steps_per_episode, num_of_trials, render= False, log=False, log_file=None):
 
-    state = problem.env.reset()[0]
+    state = problem.reset_env()
     rewards = 0
     for trial in range(num_of_trials):
         for s in range(max_steps_per_episode):
 
-            print(f"TRAINED AGENT")
-            print("Step {}".format(s+1))
+            #print(f"TRAINED AGENT")
+            #print("Step {}".format(s+1))
 
             # get highest value action from the q table
             action = np.argmax(qtable[state,:])
@@ -74,4 +72,4 @@ def evaluate(problem, qtable, max_steps_per_episode, num_of_trials, render= True
             state = new_obs
             if terminated == True:
                 break
-
+    print(f"Average rewards: {rewards/num_of_trials}" )

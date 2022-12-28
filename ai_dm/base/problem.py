@@ -49,6 +49,11 @@ class Problem (ABC):
     def apply_action(self, action):
         pass
 
+    @abstractmethod
+    def reset_env(self):
+        pass
+
+
     # get the current state
     def get_current_state(self):
         return self.current_state
