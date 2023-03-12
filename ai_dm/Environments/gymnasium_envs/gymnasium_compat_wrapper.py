@@ -1,7 +1,7 @@
 import gym
 
 
-class GymnasiumWrapper(gym.Wrapper):
+class GymnasiumCompatWrapper(gym.Wrapper):
 
     render_mode = None
 
