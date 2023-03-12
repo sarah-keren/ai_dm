@@ -3,10 +3,10 @@ __author__ = 'sarah'
 from ai_dm.Base.problem import Problem
 import ai_dm.Search.utils as utils
 
-class GymProblem(Problem):
+class GymnasiumProblem(Problem):
 
     """Problem superclass
-       supporting COMPLETE
+       supporting Gymnasium problems
     """
     def __init__(self, env, init_state, constraints=[]):
         super().__init__(init_state, constraints)

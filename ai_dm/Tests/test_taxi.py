@@ -6,7 +6,7 @@ import ai_dm.Search.utils as utils
 import ai_dm.Search.defs as defs
 import ai_dm.Search.heuristic as heuristic
 
-import ai_dm.base.comp_resources as comp_resources
+import ai_dm.Base.comp_resources as comp_resources
 
 
 
