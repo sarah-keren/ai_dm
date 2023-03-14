@@ -75,3 +75,27 @@ def evaluate(problem, qtable, max_steps_per_episode, num_of_trials, render= Fals
             if terminated == True:
                 break
     print(f"Average rewards: {rewards/num_of_trials}" )
+
+def get_max_action(qtable,state):
+
+    state = problem.reset_env()
+    rewards = 0
+    for trial in range(num_of_trials):
+        for s in range(max_steps_per_episode):
+
+            #print(f"TRAINED AGENT")
+            #print("Step {}".format(s+1))
+
+            # get highest value action from the q table
+            action = np.argmax(qtable[state,:])
+
+            # perform action
+            [new_obs, reward, terminated, truncated, info] = problem.env.step(action)
+            rewards += reward
+            if render:
+                problem.env.render()
+                print(f"score: {rewards}")
+            state = new_obs
+            if terminated == True:
+                break
+    print(f"Average rewards: {rewards/num_of_trials}" )
