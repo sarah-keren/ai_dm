@@ -3,15 +3,19 @@ __author__ = 'sarah'
 from ai_dm.Base.problem import Problem
 import ai_dm.Search.utils as utils
 
-class GymnasiumProblem(Problem):
+# Wrapping Gymnasium problems for which the probability function P can be accessed.
+# Examples include taxi, frozen_lake and Cliff Walking
+class GymnasiumProblemP(Problem):
 
     """Problem superclass
        supporting Gymnasium problems
     """
-    def __init__(self, env, init_state, constraints=[]):
+    def __init__(self, env, init_state, constraints=[], action_cost=1):
         super().__init__(init_state, constraints)
         self.env = env
         self.counter = 0
+        self.action_cost = action_cost
+        self.action_costs = None
 
     # get the actions that can be applied at the current node
     def get_applicable_actions_at_node(self, node):
@@ -40,8 +44,14 @@ class GymnasiumProblem(Problem):
 
         return successor_nodes
 
+    def set_action_costs(self, action_costs):
+        self.action_cost = action_costs
+
     def get_action_cost(self, action, state):
-        return 1
+        if self.sction_costs:
+            return self.action_costs[action]
+        else:
+            return self.action_cost
 
     def is_goal_state(self, state):
         if state.is_terminal:
