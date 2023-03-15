@@ -116,3 +116,32 @@ class Problem (ABC):
         return successor_nodes
 
 
+# problems with a discrete set of actions, and a defined probability function
+class ProblemP (Problem):
+
+    def __init__(self, initial_state, constraints, stochastic=False, P_func=None):
+        super().__init__(initial_state, constraints, stochastic)
+        self.P_func = P_func
+
+    # get the actions that can be applied at the current node
+    def get_applicable_actions_at_node(self, node):
+        action_list = self.P_func[node.state.get_key()].keys()
+        return action_list
+
+    # get the actions that can be applied at the current node
+    def get_applicable_actions_at_state(self, state):
+        action_list = self.P_func[state.get_key()].keys()
+        return action_list
+
+
+# problems with a continous set of actions, for which an actions sampling procedure is defined for a given state
+class ProblemS (Problem):
+
+    def __init__(self, initial_state, constraints, stochastic=False):
+        super().__init__(initial_state, constraints, stochastic)
+
+
+    # return the actions that are applicable in the current state
+    @abstractmethod
+    def sample_applicable_actions_at_state(self, state, sample_size):
+            pass
