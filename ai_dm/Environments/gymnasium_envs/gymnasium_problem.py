@@ -23,7 +23,7 @@ class GymnasiumProblemP(ProblemP):
 
         #action_list = self.env.P[node.state.__repr__()]
         successor_nodes = []
-        transitions = self.self.P_func[node.state.__str__()][action]
+        transitions = self.P_func[node.state.__str__()][action]
         action_cost = self.get_action_cost(action, node.state)
         for prob, next_state_key, reward, done in transitions:
             info={}
